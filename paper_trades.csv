@@ -1,0 +1,3 @@
+date,game_id,game,market,line,model,lean,edge,stake,result,notes
+2026-10-20,401909089,PHI at NY,spread,NY -4.5,NY by 5.0,NY -4.5,0.5,0 (paper),,Courtline v0 team form from 2025-26 (30% regressed); knows nothing of offseason moves (PHI added Jaylen Brown and LeBron James). Line from WagerTalk.
+2026-10-20,401909089,PHI at NY,total,231.5,226.3,under 231.5,5.2,0 (paper),,Same caveat; v0 totals had no edge in 2021-22 to 2025-26 backtests. Line from our 6:30 PM pull (FanDuel, BetRivers, BetMGM, DraftKings all 231.5; WagerTalk had 232.5).
