@@ -1,0 +1,49 @@
+# Pulls NBA odds from The Odds API once a day and commits the snapshot to odds/snapshots/.
+# Replaces the "Courtline NBA odds" Windows task on Steven's PC, so the PC no longer has to be on.
+#
+# Times are UTC. GitHub can start scheduled runs 5 to 30 minutes late, so the pull is set
+# at 22:47 UTC: 5:47 PM Eastern Standard Time (Nov to early Mar), 6:47 PM in daylight time.
+# Either way it lands before the 7 PM ET tips. About 3 credits a day, about 90 a month.
+name: Pull NBA odds
+
+on:
+  schedule:
+    - cron: "47 22 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: odds
+  cancel-in-progress: false
+
+jobs:
+  pull:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Pull odds
+        id: pull
+        env:
+          ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
+        run: python3 -I actions/fetch_nba_odds.py odds
+
+      - name: Commit and push
+        run: |
+          git config user.name "Steven Sutcliffe"
+          git config user.email "stevopotpie@users.noreply.github.com"
+          git add -f odds
+          if git diff --cached --quiet; then
+            echo "Nothing new to push."
+            exit 0
+          fi
+          git commit -q -m "NBA odds snapshot ${{ steps.pull.outputs.stamp }}"
+          git pull -q --rebase origin main
+          git push -q origin HEAD:main
