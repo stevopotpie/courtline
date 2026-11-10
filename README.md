@@ -1,5 +1,7 @@
 # Courtline: an NBA model tested against the betting market
 
+**Project page:** https://stevopotpie.github.io/courtline/
+
 Courtline is the NBA companion to [Gridline](https://github.com/stevopotpie/gridline), my NFL model. Same idea: build projections from public data, test them on games the model has not seen against the closing line, and only trust what holds up.
 
 ## Status (October 2026)
