@@ -4,6 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta property="og:title" content="Courtline">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://stevopotpie.github.io/courtline/">
+<meta property="og:image" content="https://stevopotpie.github.io/courtline/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/png" href="icon.png">
+<link rel="apple-touch-icon" href="icon.png">
 <meta property="og:description" content="An NBA model built on public data and tested against Vegas closing lines. By Steven Sutcliffe.">
 <style>img{max-width:100%}</style>
 <title>Courtline</title>
@@ -157,7 +163,7 @@ footer .links { display: flex; flex-wrap: wrap; gap: 1.25rem; }
       <p class="lede">I built an NBA model from public data and tested it on 6,573 games it had never seen. It found no edge against the closing line on sides or totals. This page covers how it was built, what the test showed, and where an edge is still plausible.</p>
       <div class="actions">
         <a class="btn primary" href="https://github.com/stevopotpie/courtline" target="_blank" rel="noopener">View the code on GitHub</a>
-        <a class="btn" href="https://github.com/stevopotpie/gridline" target="_blank" rel="noopener">See Gridline, the NFL model</a>
+        <a class="btn" href="https://stevopotpie.github.io/gridline/">See Gridline, the NFL model</a>
       </div>
     </div>
   </header>
@@ -176,7 +182,7 @@ footer .links { display: flex; flex-wrap: wrap; gap: 1.25rem; }
   <section aria-labelledby="how">
     <span class="eyebrow">How it works</span>
     <h2 id="how">Five steps, built in order</h2>
-    <p>Courtline follows the same rule as Gridline: build projections from public data, test them only on games the model has not seen, and trust only what holds up against the closing line.</p>
+    <p>Courtline follows the same rule as <a href="https://stevopotpie.github.io/gridline/">Gridline</a>: build projections from public data, test them only on games the model has not seen, and trust only what holds up against the closing line.</p>
     <ol class="steps">
       <li><h3>Collect the data</h3><p>Team and player box scores, schedules, and consensus closing spreads and totals for about 7,900 games from July 2020 to June 2026, from the open hoopR NBA dataset.</p></li>
       <li><h3>Model team form</h3><p>Exponentially weighted offensive rating, defensive rating and pace with a 12 game half life, regressed 30% toward average between seasons, plus rest days and back to backs.</p></li>
@@ -281,6 +287,7 @@ footer .links { display: flex; flex-wrap: wrap; gap: 1.25rem; }
     <p>Built by <strong style="color:var(--ink)">Steven Sutcliffe</strong>, data analyst, Atlanta Metro, GA.</p>
     <div class="links">
       <a href="https://github.com/stevopotpie/courtline" target="_blank" rel="noopener">Courtline on GitHub</a>
+      <a href="https://stevopotpie.github.io/gridline/">Gridline, the NFL model</a>
       <a href="https://github.com/stevopotpie" target="_blank" rel="noopener">All projects</a>
       <a href="https://www.linkedin.com/in/steven-sutcliffe/" target="_blank" rel="noopener">LinkedIn</a>
     </div>
