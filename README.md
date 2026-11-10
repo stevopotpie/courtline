@@ -37,4 +37,4 @@ Every 2026-27 projection is out of sample: the live model is trained only on ear
 - `paper_trades.csv`: the first hand-logged projections
 - `RUNBOOK.md`: data sources, findings and how each run works
 
-Research, not betting advice. Sports betting is not legal in every state.
+Projections are research, not betting advice. Sports betting is not legal in every state. If gambling stops being fun, call or text 1-800-GAMBLER.

@@ -63,7 +63,7 @@ ig_body = f"""<main class="wrap wide">
     <div class="panel scroll" style="padding:0"><table class="t"><thead><tr><th>Courtline said</th><th class="r">Game states</th><th class="r">Average</th><th class="r">Home team won</th></tr></thead><tbody>{cal_rows}</tbody></table></div>
     <div class="panel scroll" style="padding:0"><table class="t"><thead><tr><th>Quarter</th><th class="r">Picked winner</th><th class="r">Brier score</th></tr></thead><tbody>{q_rows}</tbody></table></div>
   </div>
-  <p class="small muted">Brier score is the average squared miss of the chance (0 is perfect, 0.25 is a coin flip). What it does not know: who has the ball, fouls to give, timeouts, injuries during the game, or a team resting its starters in a blowout. The last minute or two of a close game moves faster than any model, and live prices can change before you place a bet.</p>
+  <p class="small muted">Brier score is the average squared miss of the chance (0 is perfect, 0.25 is a coin flip). What it does not know: who has the ball, fouls to give, timeouts, injuries during the game, or a team resting its starters in a blowout. The last minute or two of a close game moves faster than any model, and live prices can change before you place a bet. If gambling stops being fun, call or text 1-800-GAMBLER.</p>
 </section>
 </main>
 """

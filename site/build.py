@@ -97,7 +97,7 @@ def footer(current):
             f'<nav aria-label="About Courtline"><h2>About</h2><ul>{about}</ul></nav>'
             f'<div class="foot"><span>Built by Steven Sutcliffe</span><a href="https://www.linkedin.com/in/steven-sutcliffe/">LinkedIn</a>'
             f'<a href="https://github.com/stevopotpie">GitHub</a><span>Rebuilt {built_text()}</span>'
-            f'<span>Research, not betting advice. Sports betting is not legal in every state.</span></div></div></footer>\n</body>\n</html>\n')
+            f'<span>Projections are research, not betting advice. Sports betting is not legal in every state. If gambling stops being fun, call or text 1-800-GAMBLER.</span></div></div></footer>\n</body>\n</html>\n')
 
 
 def page(fname, title, desc, body, extra=""):
@@ -608,6 +608,7 @@ bet_body = """<main class="wrap">
   <h1>Log a bet, see the meter</h1>
   <p class="lede">Pick a game and a bet. The meter shows Courtline's chance that the bet wins next to the chance the price needs to break even. Pending bets grade themselves once the game is final here.</p>
   <p class="small muted">Your bets are saved in this browser only. Nothing is sent anywhere, so export a copy now and then to keep it safe or move it to another device.</p>
+  <p class="small muted">If gambling stops being fun, call or text 1-800-GAMBLER.</p>
 </header>
 <section class="panel" aria-labelledby="sb-h"><h2 id="sb-h" style="font-size:1.4rem">Scoreboard</h2><div class="stats" id="kpis"></div><p class="small muted" id="kpi-sim"></p></section>
 <section class="panel" aria-labelledby="form-h" style="margin-top:1rem">
