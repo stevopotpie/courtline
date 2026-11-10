@@ -62,6 +62,12 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 .odds-toggle { order: 3; margin-left: auto; display: inline-flex; border: 1px solid var(--board-edge); border-radius: 999px; padding: 2px; }
 .odds-toggle button { font: 600 0.78rem var(--font-mono); color: var(--board-dim); background: transparent; border: 0; border-radius: 999px; padding: 4px 9px; cursor: pointer; }
 .odds-toggle button[aria-pressed="true"] { background: var(--board-ink); color: var(--board); }
+.odds-toggle .ot-l { font: 600 0.66rem var(--font-mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--board-dim); padding: 0 4px 0 8px; align-self: center; }
+.odds-in { display: flex; gap: 0.5rem; align-items: center; }
+.odds-in input { flex: 1 1 auto; }
+.odds-toggle.inline { order: 0; margin: 0; border-color: var(--line); background: var(--sunk); flex: none; }
+.odds-toggle.inline button { color: var(--muted); padding: 6px 10px; }
+.odds-toggle.inline button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
 @media (max-width: 720px) {
   .cl-links { order: 4; flex-basis: 100%; }
 }

@@ -27,7 +27,14 @@
     paint();
     document.dispatchEvent(new CustomEvent("cl-odds", { detail: f }));
   }
-  window.CL = { fmt: fmt, toDec: toDec, toAm: toAm, implied: implied, fair: fair, phi: phi,
+  function money(v) { return "$" + (v >= 100 ? Math.round(v).toLocaleString("en-US") : v.toFixed(2)); }
+  function explain(am) {
+    if (am === null || am === undefined || isNaN(Number(am))) return "";
+    am = Number(am);
+    if (fmtPref === "dec") return "A $1 bet returns " + money(toDec(am)) + " in total";
+    return am < 0 ? "Risk " + money(-am) + " to win $100" : "Risk $100 to win " + money(am);
+  }
+  window.CL = { fmt: fmt, explain: explain, toDec: toDec, toAm: toAm, implied: implied, fair: fair, phi: phi,
     format: function () { return fmtPref; }, paint: paint };
   document.addEventListener("click", function (e) {
     var b = e.target.closest && e.target.closest(".odds-toggle button");

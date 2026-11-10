@@ -79,8 +79,8 @@ def nav(current):
     return (f'<nav class="cl-nav" aria-label="Courtline pages"><div class="cl-in">'
             f'<a class="cl-brand" href="./"{" aria-current=\"page\"" if current == "index.html" else ""}><img src="icon.png" alt="" width="26" height="26">Courtline</a>'
             f'<div class="cl-links">{links}</div>'
-            f'<div class="odds-toggle" role="group" aria-label="Odds format"><button type="button" data-fmt="am" aria-pressed="true">&minus;110</button>'
-            f'<button type="button" data-fmt="dec" aria-pressed="false">1.91x</button></div></div></nav>\n')
+            f'<div class="odds-toggle" role="group" aria-label="Show odds as"><span class="ot-l">Odds</span><button type="button" data-fmt="am" aria-pressed="true" title="American odds">&minus;110</button>'
+            f'<button type="button" data-fmt="dec" aria-pressed="false" title="Decimal odds">1.91x</button></div></div></nav>\n')
 
 
 def footer(current):
@@ -461,7 +461,7 @@ page("research.html", "Courtline Research",
 M = D["model"]
 calc_data = dict(th=D["thresholds"], teams=[dict(team=r["team"], name=r["name"], ortg=r["ortg"], drtg=r["drtg"], pace=r["pace"], wins=r["wins"], losses=r["losses"]) for r in D["ratings"]],
                  model=M, games=[dict(home=g["home"], away=g["away"], home_rest=g["home_rest"], away_rest=g["away_rest"], home_spread=g.get("home_spread"),
-                                      total=g.get("total"), tip=g["tip"]) for g in upcoming])
+                                      total=g.get("total"), tip=g["tip"], ml_home=g.get("ml_home"), ml_away=g.get("ml_away")) for g in upcoming])
 calc_body = f"""<main class="wrap">
 <header class="page-head">
   <span class="eyebrow">Matchup calculator</span>
@@ -520,10 +520,11 @@ function render(){
   var rm=lin(M.ratings_margin,f), rt=lin(M.ratings_total,{exp_total:exp,h_b2b:f.h_b2b,a_b2b:f.a_b2b});
   var pH=CL.phi(rm/M.sd_ratings_margin), fav=rm>=0?h:a, pf=rm>=0?pH:1-pH;
   var same = a.team===h.team;
+  var mkt = D.games.filter(function(x){return x.home===h.team&&x.away===a.team&&x.ml_home!=null})[0];
   $("c-ratings").innerHTML = same ? '<p>Pick two different teams.</p>' :
     '<div class="stat"><span class="big">'+(Math.abs(rm)<0.05?'Even':fav.team+' by '+Math.abs(rm).toFixed(1))+'</span><span class="what">Projected margin</span><span class="n">'+name(fav.team)+' wins '+pc(pf)+' of the time</span></div>'+
     '<div class="stat"><span class="big">'+rt.toFixed(1)+'</span><span class="what">Projected total</span><span class="n">Both teams combined</span></div>'+
-    '<div class="stat"><span class="big">'+CL.fmt(CL.fair(pf))+'</span><span class="what">Fair price, '+fav.team+'</span><span class="n">'+(rm>=0?a:h).team+' fair: '+CL.fmt(CL.fair(1-pf))+'</span></div>';
+    '<div class="stat"><span class="big">'+CL.fmt(CL.fair(pf))+'</span><span class="what">Fair moneyline, '+fav.team+'</span><span class="n">'+CL.explain(CL.fair(pf))+'</span>'+'<span class="n">'+(rm>=0?a:h).team+' fair: '+CL.fmt(CL.fair(1-pf))+(mkt?' · Market: '+fav.team+' '+CL.fmt(rm>=0?mkt.ml_home:mkt.ml_away):'')+'</span></div>';
   var sp=$("c-spread").value, tt=$("c-total").value, out="";
   if (!same && sp!=="" && !isNaN(+sp)) {
     var vm=-(+sp), sm=vm+lin(M.spread,f), edge=sm-vm, side=edge>=0?h:a, line=edge>=0?+sp:-(+sp);
@@ -573,7 +574,7 @@ bet_body = """<main class="wrap">
     <label class="field"><span>Bet type</span><select id="f-market"><option value="spread">Spread</option><option value="over">Total: over</option><option value="under">Total: under</option><option value="ml">Moneyline</option></select></label>
     <label class="field" id="f-team-w"><span>Team</span><select id="f-team"></select></label>
     <label class="field" id="f-line-w"><span id="f-line-l">Line (your side, e.g. +3.5)</span><input id="f-line" type="number" step="0.5" inputmode="decimal"></label>
-    <label class="field"><span id="f-odds-l">Odds</span><input id="f-odds" type="number" step="any" inputmode="decimal"></label>
+    <div class="field"><span id="f-odds-l">Odds</span><div class="odds-in"><input id="f-odds" type="number" step="any" inputmode="decimal" aria-labelledby="f-odds-l"><div class="odds-toggle inline" role="group" aria-label="Enter odds as"><button type="button" data-fmt="am" aria-pressed="true" title="American odds">&minus;110</button><button type="button" data-fmt="dec" aria-pressed="false" title="Decimal odds">1.91x</button></div></div><p class="small muted" id="f-odds-x" style="margin:0"></p></div>
     <label class="field"><span>Stake ($)</span><input id="f-stake" type="number" step="1" min="0" inputmode="decimal" value="20"></label>
     <label class="field"><span>Result</span><select id="f-result"><option value="pending">Pending</option><option value="win">Win</option><option value="loss">Loss</option><option value="push">Push</option></select></label>
     <label class="field"><span>Real or practice</span><select id="f-kind"><option value="real">Real bet</option><option value="sim">Practice (kept separate)</option></select></label>
@@ -679,7 +680,7 @@ function meterHTML(b){
   if (c != null && be != null) { var d = 100*(c - be); t += d >= 0 ? '<strong class="good">Courtline\u2019s chance beats the price by ' + d.toFixed(1) + ' points.</strong>' : '<strong class="bad">The price asks ' + (-d).toFixed(1) + ' points more than Courtline\u2019s chance.</strong>'; }
   return h + '<p class="m-text">' + t + '</p>';
 }
-function update(){ $("meter").innerHTML = meterHTML(readForm()); }
+function update(){ var o = readOdds(); $("f-odds-x").textContent = o == null ? "" : CL.explain(o); $("meter").innerHTML = meterHTML(readForm()); }
 function autoGrade(b){
   var g = G[b.game]; if (!g || !g.final || b.result !== "pending") return;
   var m = g.hs - g.as_, tot = g.hs + g.as_, r = null;

@@ -17,11 +17,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
-<link rel="stylesheet" href="courtline.css?v=b078a940">
-<script src="courtline.js?v=e6e83233"></script>
+<link rel="stylesheet" href="courtline.css?v=16c33444">
+<script src="courtline.js?v=d010fda8"></script>
 </head>
 <body>
-<nav class="cl-nav" aria-label="Courtline pages"><div class="cl-in"><a class="cl-brand" href="./"><img src="icon.png" alt="" width="26" height="26">Courtline</a><div class="cl-links"><a href="predictions.html">Predictions</a><a href="research.html">Research</a><a href="calculator.html">Calculator</a><a href="bet-log.html" aria-current="page">Bet log</a><a class="ext" href="https://stevopotpie.github.io/gridline/">Gridline (NFL)</a><a class="ext" href="https://github.com/stevopotpie/courtline">GitHub</a></div><div class="odds-toggle" role="group" aria-label="Odds format"><button type="button" data-fmt="am" aria-pressed="true">&minus;110</button><button type="button" data-fmt="dec" aria-pressed="false">1.91x</button></div></div></nav>
+<nav class="cl-nav" aria-label="Courtline pages"><div class="cl-in"><a class="cl-brand" href="./"><img src="icon.png" alt="" width="26" height="26">Courtline</a><div class="cl-links"><a href="predictions.html">Predictions</a><a href="research.html">Research</a><a href="calculator.html">Calculator</a><a href="bet-log.html" aria-current="page">Bet log</a><a class="ext" href="https://stevopotpie.github.io/gridline/">Gridline (NFL)</a><a class="ext" href="https://github.com/stevopotpie/courtline">GitHub</a></div><div class="odds-toggle" role="group" aria-label="Show odds as"><span class="ot-l">Odds</span><button type="button" data-fmt="am" aria-pressed="true" title="American odds">&minus;110</button><button type="button" data-fmt="dec" aria-pressed="false" title="Decimal odds">1.91x</button></div></div></nav>
 <style>
 .meter{display:grid;gap:.45rem;padding:.8rem .9rem;background:var(--sunk);border-radius:8px}
 .m-bar{position:relative;height:14px;border-radius:999px;background:linear-gradient(90deg,#C0392B 0%,#D98A1E 45%,#C9B23A 55%,#2E9E5B 100%)}
@@ -52,7 +52,7 @@
     <label class="field"><span>Bet type</span><select id="f-market"><option value="spread">Spread</option><option value="over">Total: over</option><option value="under">Total: under</option><option value="ml">Moneyline</option></select></label>
     <label class="field" id="f-team-w"><span>Team</span><select id="f-team"></select></label>
     <label class="field" id="f-line-w"><span id="f-line-l">Line (your side, e.g. +3.5)</span><input id="f-line" type="number" step="0.5" inputmode="decimal"></label>
-    <label class="field"><span id="f-odds-l">Odds</span><input id="f-odds" type="number" step="any" inputmode="decimal"></label>
+    <div class="field"><span id="f-odds-l">Odds</span><div class="odds-in"><input id="f-odds" type="number" step="any" inputmode="decimal" aria-labelledby="f-odds-l"><div class="odds-toggle inline" role="group" aria-label="Enter odds as"><button type="button" data-fmt="am" aria-pressed="true" title="American odds">&minus;110</button><button type="button" data-fmt="dec" aria-pressed="false" title="Decimal odds">1.91x</button></div></div><p class="small muted" id="f-odds-x" style="margin:0"></p></div>
     <label class="field"><span>Stake ($)</span><input id="f-stake" type="number" step="1" min="0" inputmode="decimal" value="20"></label>
     <label class="field"><span>Result</span><select id="f-result"><option value="pending">Pending</option><option value="win">Win</option><option value="loss">Loss</option><option value="push">Push</option></select></label>
     <label class="field"><span>Real or practice</span><select id="f-kind"><option value="real">Real bet</option><option value="sim">Practice (kept separate)</option></select></label>
@@ -142,7 +142,7 @@ function meterHTML(b){
   if (c != null && be != null) { var d = 100*(c - be); t += d >= 0 ? '<strong class="good">Courtline\u2019s chance beats the price by ' + d.toFixed(1) + ' points.</strong>' : '<strong class="bad">The price asks ' + (-d).toFixed(1) + ' points more than Courtline\u2019s chance.</strong>'; }
   return h + '<p class="m-text">' + t + '</p>';
 }
-function update(){ $("meter").innerHTML = meterHTML(readForm()); }
+function update(){ var o = readOdds(); $("f-odds-x").textContent = o == null ? "" : CL.explain(o); $("meter").innerHTML = meterHTML(readForm()); }
 function autoGrade(b){
   var g = G[b.game]; if (!g || !g.final || b.result !== "pending") return;
   var m = g.hs - g.as_, tot = g.hs + g.as_, r = null;
