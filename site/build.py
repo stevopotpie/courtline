@@ -105,6 +105,8 @@ def page(fname, title, desc, body, extra=""):
 
 
 # ------------------------------------------------------------------ shared bits
+phi_ = lambda z: 0.5 * (1 + math.erf(z / math.sqrt(2)))
+M = D["model"]
 B, S = D["backtest"], D["season"]
 GAMES = D["games"]
 TEAMS = {r["team"]: r for r in D["ratings"]}
@@ -297,10 +299,16 @@ def game_card(g):
               f'<span class="pick">{"<span class=\"pill lean\">Lean</span> " if lean else ""}{(g["total_pick"] or "no side").title()} {g["total"]:g} · {100 * ch:.1f}%</span></div>')
     else:
         tt = f'<div class="mk"><span class="lab">Total</span><span class="mkt">Not posted</span><span class="cl">Ratings only: {g["ratings_total"]:.1f}</span><span class="pick"></span></div>'
-    ml = ""
+    pm = g.get("proj_margin")
+    ph = phi_(pm / M["sd_margin"]) if pm is not None else phi_(g["ratings_margin"] / M["sd_ratings_margin"])
+    fav, fp = (g["home"], ph) if ph >= 0.5 else (g["away"], 1 - ph)
     if g.get("ml_home") is not None:
         ml = (f'<div class="mk"><span class="lab">Moneyline</span><span class="mkt">{g["away"]} <span class="odds" data-am="{g["ml_away"]:.0f}">{g["ml_away"]:+.0f}</span> · '
-              f'{g["home"]} <span class="odds" data-am="{g["ml_home"]:.0f}">{g["ml_home"]:+.0f}</span></span><span class="cl"></span><span class="pick"></span></div>')
+              f'{g["home"]} <span class="odds" data-am="{g["ml_home"]:.0f}">{g["ml_home"]:+.0f}</span></span><span class="cl">Courtline: {fav} wins {100 * fp:.1f}%</span>'
+              f'<span class="pick ml-tools"><div class="odds-toggle inline" role="group" aria-label="Odds format"><button type="button" data-fmt="am" aria-pressed="true" title="American odds">&minus;110</button><button type="button" data-fmt="dec" aria-pressed="false" title="Decimal odds">1.91x</button></div><a href="calculator.html?g={g["game_id"]}">Check a price</a></span></div>')
+    else:
+        ml = (f'<div class="mk"><span class="lab">Moneyline</span><span class="mkt">Not posted</span><span class="cl">Courtline: {fav} wins {100 * fp:.1f}%</span>'
+              f'<span class="pick ml-tools"><a href="calculator.html?g={g["game_id"]}">Check a price</a></span></div>')
     pulled = f'Line from the {et(g["pulled_utc"], "%-I:%M %p ET %b %-d")} pull, median of {g["books"]} books' if g.get("pulled_utc") else "No line in an odds pull yet"
     return (f'<article class="game"><div class="g-top"><span class="tip">{et(g["tip"])} ET</span>{"".join(tags)}</div>'
             f'<div class="teams"><span><strong>{e(g["away_name"])}</strong> <span class="muted small">{team_rec(g["away"])}</span></span>'
@@ -382,6 +390,7 @@ pred_css = """<style>
 .mk{display:grid;grid-template-columns:6.5rem minmax(0,1fr) minmax(0,1.2fr) minmax(0,1.3fr);gap:.2rem .8rem;align-items:baseline;padding:.4rem 0;border-top:1px solid var(--line);font-size:.93rem}
 .mk .lab{font:600 .7rem var(--font-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
 .mk .mkt{font-family:var(--font-mono)}.mk .cl{color:var(--muted)}.mk .pick{font-weight:600}
+.ml-tools{display:flex;flex-wrap:wrap;gap:.5rem .75rem;align-items:center;font-weight:600}.ml-tools .odds-toggle button{padding:3px 8px;font-size:.72rem}
 @media (max-width:640px){.mk{grid-template-columns:5.5rem minmax(0,1fr)}.mk .cl,.mk .pick{grid-column:2}}
 </style>
 """
@@ -460,13 +469,13 @@ page("research.html", "Courtline Research",
 # ------------------------------------------------------------------ calculator
 M = D["model"]
 calc_data = dict(th=D["thresholds"], teams=[dict(team=r["team"], name=r["name"], ortg=r["ortg"], drtg=r["drtg"], pace=r["pace"], wins=r["wins"], losses=r["losses"]) for r in D["ratings"]],
-                 model=M, games=[dict(home=g["home"], away=g["away"], home_rest=g["home_rest"], away_rest=g["away_rest"], home_spread=g.get("home_spread"),
+                 model=M, games=[dict(id=g["game_id"], home=g["home"], away=g["away"], home_rest=g["home_rest"], away_rest=g["away_rest"], home_spread=g.get("home_spread"),
                                       total=g.get("total"), tip=g["tip"], ml_home=g.get("ml_home"), ml_away=g.get("ml_away")) for g in upcoming])
 calc_body = f"""<main class="wrap">
 <header class="page-head">
   <span class="eyebrow">Matchup calculator</span>
   <h1>Set any matchup</h1>
-  <p class="lede">Pick two teams and their rest. Courtline projects the margin and total from team ratings alone. Add the market's spread and total to see where Courtline would set them, which side it takes, and the fair price.</p>
+  <p class="lede">Pick two teams and their rest. Courtline projects the margin and total from team ratings alone. Add the market's spread and total to see where Courtline would set them, and type in any moneyline price to see whether it is worth it.</p>
 </header>
 <div class="calc">
   <form class="panel grid2" id="cf" novalidate>
@@ -476,11 +485,15 @@ calc_body = f"""<main class="wrap">
     <label class="field"><span>Home rest</span><select id="c-hrest"><option value="1">Back to back</option><option value="2" selected>1 day off</option><option value="3">2 days off</option><option value="4">3+ days off</option></select></label>
     <label class="field"><span>Home spread (optional, e.g. &minus;4.5)</span><input id="c-spread" type="number" step="0.5" inputmode="decimal"></label>
     <label class="field"><span>Total (optional, e.g. 226.5)</span><input id="c-total" type="number" step="0.5" inputmode="decimal"></label>
+    <div class="field"><span id="c-mla-l">Away moneyline</span><input id="c-mla" type="number" step="any" inputmode="decimal" aria-labelledby="c-mla-l"></div>
+    <div class="field"><span id="c-mlh-l">Home moneyline</span><input id="c-mlh" type="number" step="any" inputmode="decimal" aria-labelledby="c-mlh-l"></div>
+    <div class="full ml-row"><span class="small muted">Type the prices your book shows, before or during the game. Enter them as</span><div class="odds-toggle inline" role="group" aria-label="Odds format"><button type="button" data-fmt="am" aria-pressed="true" title="American odds">&minus;110</button><button type="button" data-fmt="dec" aria-pressed="false" title="Decimal odds">1.91x</button></div></div>
     <p class="full small muted" id="c-prefill"></p>
   </form>
   <div class="out" aria-live="polite">
     <div class="panel"><span class="eyebrow">From ratings alone</span><div class="stats" id="c-ratings"></div></div>
     <div class="panel" id="c-market-w"><span class="eyebrow">Against the market</span><div id="c-market"></div></div>
+    <div class="panel"><span class="eyebrow">The moneyline</span><div id="c-ml"></div></div>
     <div class="panel"><span class="eyebrow">The two teams</span><div class="scroll"><table class="t" id="c-teams"></table></div></div>
   </div>
 </div>
@@ -488,10 +501,12 @@ calc_body = f"""<main class="wrap">
 </main>
 """
 calc_css = """<style>
-.calc{display:grid;gap:1rem}
+.calc{display:grid;gap:1rem}.calc>*,.out>*{min-width:0}
 .out{display:grid;gap:1rem}
 .verdict{font-size:1.05rem}.verdict strong{color:var(--accent-ink)}
 .mrow{display:grid;grid-template-columns:repeat(auto-fit,minmax(12rem,1fr));gap:.9rem;margin-top:.5rem}
+.ml-row{display:flex;flex-wrap:wrap;gap:.5rem .75rem;align-items:center}
+.good{color:var(--good);font-weight:600}.bad{color:var(--bad);font-weight:600}
 </style>
 """
 calc_js = """<script>
@@ -501,12 +516,16 @@ var T = {}; D.teams.forEach(function(t){T[t.team]=t});
 var sorted = D.teams.slice().sort(function(a,b){return a.name.localeCompare(b.name)});
 ["c-away","c-home"].forEach(function(id){ $(id).innerHTML = sorted.map(function(t){return '<option value="'+t.team+'">'+t.name+'</option>'}).join("") });
 function restSel(v){ return String(Math.max(1, Math.min(4, v))) }
-var g = D.games.filter(function(x){return x.home_spread!==null})[0] || D.games[0];
+var want = (location.search.match(/[?&]g=([0-9]+)/)||[])[1];
+var g = (want && D.games.filter(function(x){return String(x.id)===want})[0]) || D.games.filter(function(x){return x.home_spread!==null})[0] || D.games[0];
+function showPrice(am){ if (am==null) return ""; return CL.format()==="dec" ? CL.toDec(am).toFixed(2) : String(Math.round(am)); }
 if (g && T[g.home] && T[g.away]) {
   $("c-away").value=g.away; $("c-home").value=g.home; $("c-arest").value=restSel(g.away_rest); $("c-hrest").value=restSel(g.home_rest);
   if (g.home_spread!==null) $("c-spread").value=g.home_spread; if (g.total!==null) $("c-total").value=g.total;
-  $("c-prefill").textContent = "Filled in with the next game on the board"+(g.home_spread!==null?" and its market number":"")+". Change anything.";
+  if (g.ml_away!=null) $("c-mla").value=showPrice(g.ml_away); if (g.ml_home!=null) $("c-mlh").value=showPrice(g.ml_home);
+  $("c-prefill").textContent = (want && String(g.id)===want ? "Filled in with this game" : "Filled in with the next game on the board")+(g.home_spread!==null?" and its market numbers from the latest odds pull":"")+". Change anything.";
 } else { $("c-away").value=sorted[0].team; $("c-home").value=sorted[1].team; }
+function readPrice(id){ var v=$(id).value; if (v===""||isNaN(+v)) return null; v=+v; if (CL.format()==="dec") return v>1?CL.toAm(v):null; return (v>=100||v<=-100)?v:null; }
 function lin(c, f){ var s=c.intercept; for (var k in f) if (k in c) s+=c[k]*f[k]; return s }
 function name(ab){ return T[ab]?T[ab].name:ab }
 function pc(p){ return (100*p).toFixed(1)+"%" }
@@ -538,13 +557,37 @@ function render(){
       '<div class="stat"><span class="big">'+(up?'Over ':'Under ')+vt+'</span><span class="what">Courtline\\'s side</span><span class="n">'+(Math.abs(te)>=D.th.total?'Lean, ':'')+Math.abs(te).toFixed(1)+' pts off · hits '+pc(up?oc:1-oc)+'</span></div></div>';
   }
   $("c-market").innerHTML = out || '<p class="muted">Enter the home spread or the total to compare with the market.</p>';
+  $("c-mla-l").textContent = a.team+" moneyline"; $("c-mlh-l").textContent = h.team+" moneyline";
+  var withLine = !same && sp!=="" && !isNaN(+sp);
+  var pm = withLine ? -(+sp)+lin(M.spread,f) : rm, ph = CL.phi(pm/(withLine?M.sd_margin:M.sd_ratings_margin));
+  var pa=readPrice("c-mla"), phm=readPrice("c-mlh"), ml="";
+  if (!same && (pa!=null || phm!=null)) {
+    var ia = pa!=null?CL.implied(pa):null, ih = phm!=null?CL.implied(phm):null, both = ia!=null&&ih!=null, sum = both?ia+ih:null;
+    var rowML = function(t, price, imp, mine){
+      if (price==null) return '<tr><td>'+t.team+'</td><td class="m">\u2013</td><td class="r m">\u2013</td><td class="r m">\u2013</td><td class="r m">'+pc(mine)+'</td><td>Enter a price</td></tr>';
+      var d = 100*(mine-imp);
+      return '<tr><td><strong>'+t.team+'</strong></td><td class="m">'+CL.fmt(price)+'</td><td class="r m">'+pc(imp)+'</td><td class="r m">'+(both?pc(imp/sum):'\u2013')+'</td><td class="r m">'+pc(mine)+'</td>'+
+        '<td>'+(d>=0?'<span class="good">Worth it by '+d.toFixed(1)+' pts</span>':'<span class="bad">Short by '+(-d).toFixed(1)+' pts</span>')+'</td></tr>';
+    };
+    ml = '<div class="scroll"><table class="t"><thead><tr><th>Team</th><th>Price</th><th class="r">Needs to win</th><th class="r">Market, no vig</th><th class="r">Courtline</th><th>At this price</th></tr></thead><tbody>'+
+      rowML(a,pa,ia,1-ph)+rowML(h,phm,ih,ph)+'</tbody></table></div>';
+    ml += '<p class="small muted">'+(both?'The two prices add up to '+pc(sum)+', so the book\u2019s cut is '+(100*(sum-1)).toFixed(1)+'%. ':'Enter both prices to see the market\u2019s chance with the cut taken out. ')+
+      '"Needs to win" is how often a bet at that price has to win to break even. Courtline\u2019s chance uses '+(withLine?'the market spread above':'team ratings alone')+
+      ' and is a pregame number: once the game starts, the score and the clock matter more than anything here, so treat live prices with care.</p>';
+  }
+  $("c-ml").innerHTML = ml || '<p class="muted">Type a moneyline price for either team to see what it needs to win and whether Courtline thinks it is worth it.</p>';
   var row=function(l,x,y){return '<tr><td>'+l+'</td><td class="r m">'+x+'</td><td class="r m">'+y+'</td></tr>'};
   $("c-teams").innerHTML='<thead><tr><th></th><th class="r">'+a.team+'</th><th class="r">'+h.team+'</th></tr></thead><tbody>'+
     row('Record',a.wins+'\\u2013'+a.losses,h.wins+'\\u2013'+h.losses)+row('Off. rating',a.ortg.toFixed(1),h.ortg.toFixed(1))+row('Def. rating',a.drtg.toFixed(1),h.drtg.toFixed(1))+
     row('Net',(a.ortg-a.drtg).toFixed(1),(h.ortg-h.drtg).toFixed(1))+row('Pace',a.pace.toFixed(1),h.pace.toFixed(1))+'</tbody>';
 }
-["c-away","c-home","c-arest","c-hrest","c-spread","c-total"].forEach(function(id){ $(id).addEventListener("input",render); $(id).addEventListener("change",render) });
-document.addEventListener("cl-odds",render); render();
+["c-away","c-home","c-arest","c-hrest","c-spread","c-total","c-mla","c-mlh"].forEach(function(id){ $(id).addEventListener("input",render); $(id).addEventListener("change",render) });
+var lastFmt = CL.format();
+document.addEventListener("cl-odds",function(){
+  ["c-mla","c-mlh"].forEach(function(id){ var v=$(id).value; if (v===""||isNaN(+v)) return;
+    var am = lastFmt==="dec" ? (+v>1?CL.toAm(+v):null) : +v; $(id).value = am==null?"":showPrice(am); });
+  lastFmt = CL.format(); render();
+}); render();
 })();
 </script>
 """.replace("__DATA__", json.dumps(calc_data, separators=(",", ":")))

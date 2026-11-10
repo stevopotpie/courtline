@@ -102,6 +102,7 @@ section.block { padding-block: 2.25rem; border-top: 1px solid var(--line); displ
 
 /* panels, stats, tables */
 .panel { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 1rem 1.1rem; display: grid; gap: 0.75rem; min-width: 0; }
+.panel > * { min-width: 0; }
 .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr)); gap: 0.9rem; }
 .stat { border-left: 3px solid var(--accent); padding: 0.15rem 0 0.15rem 0.9rem; display: grid; gap: 0.2rem; min-width: 0; }
 .stat .big { font: 600 1.75rem var(--font-mono); font-variant-numeric: tabular-nums; line-height: 1.1; }
