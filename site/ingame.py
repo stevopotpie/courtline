@@ -157,7 +157,7 @@ function paintCard(id){
   q(c, "ig-prices").hidden = done;
   q(c, "ig-pa").placeholder = g.away + " price"; q(c, "ig-ph").placeholder = g.home + " price";
   q(c, "ig-fair").innerHTML = done ? "Final." : ("Fair price now: " + esc(g.away) + " " + CL.fmt(CL.fair(1 - ph)) + " · " + esc(g.home) + " " + CL.fmt(CL.fair(ph)) +
-    (g.state === "pre" ? ". Before tip this is the chance from the pregame spread; it moves with the score once the game starts." : ""));
+    (g.state === "pre" ? ". Before tip this is the pregame chance; it moves with the score once the game starts." : ""));
   q(c, "ig-v").innerHTML = done ? "" : verdict(g.away, g.home, ph, readPrice(q(c, "ig-pa")), readPrice(q(c, "ig-ph")));
 }
 function setStatus(cls, text){ $("ig-dot").className = "dot " + cls; $("ig-status").textContent = text; }
