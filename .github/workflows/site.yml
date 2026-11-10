@@ -1,0 +1,62 @@
+# Rebuilds the Courtline site without pulling odds: grades last night's games once the hoopR box scores
+# update (they landed around 11:30 AM ET on Nov 10 2026), and refreshes the ratings and the board.
+# Also runs when the model or site code changes, and on demand.
+#
+# 17:17 UTC is 12:17 PM Eastern Standard Time, 1:17 PM in daylight time.
+name: Rebuild site
+
+on:
+  schedule:
+    - cron: "17 17 * * *"
+  push:
+    branches: [main]
+    paths:
+      - "model.py"
+      - "site/**"
+      - "run_site.sh"
+      - "requirements.txt"
+      - ".github/workflows/site.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+
+concurrency:
+  group: odds
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Rebuild the site
+        run: |
+          pip install -q -r requirements.txt
+          bash run_site.sh "$GITHUB_WORKSPACE"
+
+      - name: Commit and push
+        run: |
+          git config user.name "Steven Sutcliffe"
+          git config user.email "stevopotpie@users.noreply.github.com"
+          git add -f data docs
+          if git diff --cached --quiet; then
+            echo "Nothing new to push."
+            exit 0
+          fi
+          git commit -q -m "Site rebuild $(date -u +%Y-%m-%d_%H%MZ)"
+          git pull -q --rebase origin main
+          git push -q origin HEAD:main
+
+      - name: Request a Pages build
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api -X POST "repos/${{ github.repository }}/pages/builds" --silent || echo "Pages build request failed; the next push will publish."

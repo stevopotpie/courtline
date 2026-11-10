@@ -1,4 +1,5 @@
-# Pulls NBA odds from The Odds API once a day and commits the snapshot to odds/snapshots/.
+# Pulls NBA odds from The Odds API once a day, rebuilds the Courtline site with the new lines,
+# and commits the snapshot, the model output (data/) and the site (docs/) together.
 # Replaces the "Courtline NBA odds" Windows task on Steven's PC, so the PC no longer has to be on.
 #
 # Times are UTC. GitHub can start scheduled runs 5 to 30 minutes late, so the pull is set
@@ -13,6 +14,7 @@ on:
 
 permissions:
   contents: write
+  pages: write
 
 concurrency:
   group: odds
@@ -21,13 +23,14 @@ concurrency:
 jobs:
   pull:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
 
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: "3.12"
+          cache: pip
 
       - name: Pull odds
         id: pull
@@ -35,15 +38,26 @@ jobs:
           ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
         run: python3 -I actions/fetch_nba_odds.py odds
 
+      - name: Rebuild the site
+        run: |
+          pip install -q -r requirements.txt
+          bash run_site.sh "$GITHUB_WORKSPACE"
+
       - name: Commit and push
         run: |
           git config user.name "Steven Sutcliffe"
           git config user.email "stevopotpie@users.noreply.github.com"
-          git add -f odds
+          git add -f odds data docs
           if git diff --cached --quiet; then
             echo "Nothing new to push."
             exit 0
           fi
-          git commit -q -m "NBA odds snapshot ${{ steps.pull.outputs.stamp }}"
+          git commit -q -m "NBA odds snapshot ${{ steps.pull.outputs.stamp }} and site rebuild"
           git pull -q --rebase origin main
           git push -q origin HEAD:main
+
+      # Pushes made with the workflow token may not start a Pages build on their own, so ask for one.
+      - name: Request a Pages build
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh api -X POST "repos/${{ github.repository }}/pages/builds" --silent || echo "Pages build request failed; the next push will publish."

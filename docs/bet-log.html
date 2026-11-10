@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Courtline Bet Log</title>
+<meta name="description" content="Log NBA bets and see Courtline&#x27;s chance against the price. Bets are saved in your browser only, with export and import.">
+<link rel="canonical" href="https://stevopotpie.github.io/courtline/bet-log.html">
+<meta property="og:title" content="Courtline Bet Log">
+<meta property="og:description" content="Log NBA bets and see Courtline&#x27;s chance against the price. Bets are saved in your browser only, with export and import.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://stevopotpie.github.io/courtline/bet-log.html">
+<meta property="og:image" content="https://stevopotpie.github.io/courtline/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/png" href="icon.png">
+<link rel="apple-touch-icon" href="icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="courtline.css?v=b078a940">
+<script src="courtline.js?v=e6e83233"></script>
+</head>
+<body>
+<nav class="cl-nav" aria-label="Courtline pages"><div class="cl-in"><a class="cl-brand" href="./"><img src="icon.png" alt="" width="26" height="26">Courtline</a><div class="cl-links"><a href="predictions.html">Predictions</a><a href="research.html">Research</a><a href="calculator.html">Calculator</a><a href="bet-log.html" aria-current="page">Bet log</a><a class="ext" href="https://stevopotpie.github.io/gridline/">Gridline (NFL)</a><a class="ext" href="https://github.com/stevopotpie/courtline">GitHub</a></div><div class="odds-toggle" role="group" aria-label="Odds format"><button type="button" data-fmt="am" aria-pressed="true">&minus;110</button><button type="button" data-fmt="dec" aria-pressed="false">1.91x</button></div></div></nav>
+<style>
+.meter{display:grid;gap:.45rem;padding:.8rem .9rem;background:var(--sunk);border-radius:8px}
+.m-bar{position:relative;height:14px;border-radius:999px;background:linear-gradient(90deg,#C0392B 0%,#D98A1E 45%,#C9B23A 55%,#2E9E5B 100%)}
+.m-mark{position:absolute;top:-5px;width:4px;height:24px;margin-left:-2px;background:var(--ink);border-radius:2px;box-shadow:0 0 0 2px var(--sunk)}
+.m-be{position:absolute;top:-3px;width:2px;height:20px;margin-left:-1px;background:var(--surface);opacity:.95}
+.m-scale{display:flex;justify-content:space-between;font:600 .68rem var(--font-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.m-text{font-size:.95rem}.m-text strong.good{color:var(--good)}.m-text strong.bad{color:var(--bad)}
+.bets{display:grid;gap:.6rem}
+.bet{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:.3rem .8rem;padding:.75rem .85rem;border:1px solid var(--line);border-radius:8px;background:var(--bg)}
+.bet .who{font-weight:600}.bet .meta{font-size:.85rem;color:var(--muted)}
+.bet .right{text-align:right;display:grid;gap:.3rem;justify-items:end}
+.bet .acts{display:flex;gap:.4rem}.bet .acts button{font:600 .78rem var(--font-body);background:none;border:0;color:var(--accent-ink);cursor:pointer;padding:0}
+.empty{color:var(--muted);font-size:.95rem}
+</style>
+<main class="wrap">
+<header class="page-head">
+  <span class="eyebrow">Bet log</span>
+  <h1>Log a bet, see the meter</h1>
+  <p class="lede">Pick a game and a bet. The meter shows Courtline's chance that the bet wins next to the chance the price needs to break even. Pending bets grade themselves once the game is final here.</p>
+  <p class="small muted">Your bets are saved in this browser only. Nothing is sent anywhere, so export a copy now and then to keep it safe or move it to another device.</p>
+</header>
+<section class="panel" aria-labelledby="sb-h"><h2 id="sb-h" style="font-size:1.4rem">Scoreboard</h2><div class="stats" id="kpis"></div><p class="small muted" id="kpi-sim"></p></section>
+<section class="panel" aria-labelledby="form-h" style="margin-top:1rem">
+  <h2 id="form-h" style="font-size:1.4rem">Log a bet</h2>
+  <form id="f" class="grid2" novalidate>
+    <label class="field full"><span>Game</span><select id="f-game"></select></label>
+    <label class="field full" id="f-desc-w" hidden><span>Game (type it in)</span><input id="f-desc" type="text" autocomplete="off" placeholder="e.g. Lakers at Celtics, Dec 25"></label>
+    <label class="field"><span>Bet type</span><select id="f-market"><option value="spread">Spread</option><option value="over">Total: over</option><option value="under">Total: under</option><option value="ml">Moneyline</option></select></label>
+    <label class="field" id="f-team-w"><span>Team</span><select id="f-team"></select></label>
+    <label class="field" id="f-line-w"><span id="f-line-l">Line (your side, e.g. +3.5)</span><input id="f-line" type="number" step="0.5" inputmode="decimal"></label>
+    <label class="field"><span id="f-odds-l">Odds</span><input id="f-odds" type="number" step="any" inputmode="decimal"></label>
+    <label class="field"><span>Stake ($)</span><input id="f-stake" type="number" step="1" min="0" inputmode="decimal" value="20"></label>
+    <label class="field"><span>Result</span><select id="f-result"><option value="pending">Pending</option><option value="win">Win</option><option value="loss">Loss</option><option value="push">Push</option></select></label>
+    <label class="field"><span>Real or practice</span><select id="f-kind"><option value="real">Real bet</option><option value="sim">Practice (kept separate)</option></select></label>
+    <label class="field full"><span>Notes</span><input id="f-notes" type="text" autocomplete="off" placeholder="Why you liked it"></label>
+    <div class="meter full" id="meter" aria-live="polite"></div>
+    <div class="full actions" style="align-items:center"><button type="submit" class="btn primary" id="f-save">Save bet</button><button type="button" class="btn" id="f-cancel" hidden>Cancel edit</button><span class="msg" id="f-msg"></span></div>
+  </form>
+</section>
+<section class="panel" aria-labelledby="led-h" style="margin-top:1rem">
+  <h2 id="led-h" style="font-size:1.4rem">Ledger</h2>
+  <div class="actions"><button type="button" class="btn small" id="l-export">Export bets</button><button type="button" class="btn small" id="l-import">Import bets</button>
+    <input type="file" id="l-file" accept="application/json,.json" hidden><span class="msg" id="l-msg"></span></div>
+  <div class="bets" id="bets"></div>
+</section>
+</main>
+<script>
+(function(){
+var D = {"games":[{"id":401909090,"tip":"2026-10-21T01:50:00+00:00","home":"SA","away":"OKC","hn":"San Antonio Spurs","an":"Oklahoma City Thunder","final":true,"hs":104,"as_":116,"sp":1.0,"tot":231.0,"pm":-1.1,"pt":232.0,"rm":2.7,"rt":223.5},{"id":401909834,"tip":"2026-10-21T23:00:00+00:00","home":"ORL","away":"ATL","hn":"Orlando Magic","an":"Atlanta Hawks","final":true,"hs":125,"as_":132,"sp":-2.0,"tot":233.5,"pm":1.9,"pt":234.8,"rm":2.4,"rt":225.5},{"id":401909835,"tip":"2026-10-21T23:00:00+00:00","home":"WSH","away":"MIL","hn":"Washington Wizards","an":"Milwaukee Bucks","final":true,"hs":128,"as_":116,"sp":-4.0,"tot":238.0,"pm":3.9,"pt":239.6,"rm":0.2,"rt":232.9},{"id":401909091,"tip":"2026-10-21T23:30:00+00:00","home":"MIA","away":"MIN","hn":"Miami Heat","an":"Minnesota Timberwolves","final":true,"hs":106,"as_":131,"sp":-1.5,"tot":240.5,"pm":1.5,"pt":241.2,"rm":5.0,"rt":233.9},{"id":401909836,"tip":"2026-10-21T23:30:00+00:00","home":"BKN","away":"CHA","hn":"Brooklyn Nets","an":"Charlotte Hornets","final":true,"hs":103,"as_":110,"sp":1.5,"tot":220.0,"pm":-1.8,"pt":221.0,"rm":-10.6,"rt":222.7},{"id":401909837,"tip":"2026-10-21T23:30:00+00:00","home":"TOR","away":"CHI","hn":"Toronto Raptors","an":"Chicago Bulls","final":true,"hs":135,"as_":92,"sp":-10.5,"tot":237.5,"pm":10.5,"pt":238.3,"rm":8.6,"rt":231.4},{"id":401909838,"tip":"2026-10-22T00:00:00+00:00","home":"MEM","away":"UTAH","hn":"Memphis Grizzlies","an":"Utah Jazz","final":true,"hs":123,"as_":103,"sp":-1.5,"tot":241.5,"pm":1.4,"pt":242.2,"rm":0.1,"rt":239.1},{"id":401909839,"tip":"2026-10-22T00:00:00+00:00","home":"NO","away":"IND","hn":"New Orleans Pelicans","an":"Indiana Pacers","final":true,"hs":120,"as_":123,"sp":3.0,"tot":239.0,"pm":-3.1,"pt":239.8,"rm":4.4,"rt":234.5},{"id":401909840,"tip":"2026-10-22T00:30:00+00:00","home":"HOU","away":"DAL","hn":"Houston Rockets","an":"Dallas Mavericks","final":true,"hs":128,"as_":110,"sp":-10.0,"tot":230.0,"pm":10.0,"pt":230.7,"rm":9.2,"rt":228.5},{"id":401909092,"tip":"2026-10-22T02:00:00+00:00","home":"LAL","away":"GS","hn":"Los Angeles Lakers","an":"Golden State Warriors","final":true,"hs":127,"as_":105,"sp":-6.5,"tot":233.5,"pm":6.5,"pt":235.2,"rm":5.0,"rt":225.4},{"id":401909841,"tip":"2026-10-22T02:00:00+00:00","home":"POR","away":"PHX","hn":"Portland Trail Blazers","an":"Phoenix Suns","final":true,"hs":124,"as_":83,"sp":-2.5,"tot":231.5,"pm":2.4,"pt":233.1,"rm":4.2,"rt":223.8},{"id":401909842,"tip":"2026-10-22T02:30:00+00:00","home":"LAC","away":"SAC","hn":"LA Clippers","an":"Sacramento Kings","final":true,"hs":121,"as_":96,"sp":-5.0,"tot":227.0,"pm":5.0,"pt":227.7,"rm":9.3,"rt":229.4},{"id":401909093,"tip":"2026-10-22T23:00:00+00:00","home":"PHI","away":"CLE","hn":"Philadelphia 76ers","an":"Cleveland Cavaliers","final":true,"hs":114,"as_":106,"sp":-2.5,"tot":236.5,"pm":2.0,"pt":238.6,"rm":1.1,"rt":224.3},{"id":401909094,"tip":"2026-10-23T01:30:00+00:00","home":"OKC","away":"DEN","hn":"Oklahoma City Thunder","an":"Denver Nuggets","final":true,"hs":96,"as_":84,"sp":-8.0,"tot":236.5,"pm":7.5,"pt":237.2,"rm":4.9,"rt":229.5},{"id":401909848,"tip":"2026-10-23T20:00:00+00:00","home":"MIL","away":"CHI","hn":"Milwaukee Bucks","an":"Chicago Bulls","final":true,"hs":125,"as_":132,"sp":-1.0,"tot":237.5,"pm":0.9,"pt":238.7,"rm":2.6,"rt":232.8},{"id":401909095,"tip":"2026-10-23T23:00:00+00:00","home":"BOS","away":"NY","hn":"Boston Celtics","an":"New York Knicks","final":true,"hs":107,"as_":103,"sp":-2.5,"tot":220.5,"pm":2.4,"pt":221.3,"rm":-0.1,"rt":219.5},{"id":401909843,"tip":"2026-10-23T23:00:00+00:00","home":"CHA","away":"ATL","hn":"Charlotte Hornets","an":"Atlanta Hawks","final":true,"hs":81,"as_":128,"sp":2.5,"tot":227.0,"pm":-2.5,"pt":227.5,"rm":8.2,"rt":226.5},{"id":401909844,"tip":"2026-10-23T23:00:00+00:00","home":"IND","away":"DAL","hn":"Indiana Pacers","an":"Dallas Mavericks","final":true,"hs":105,"as_":121,"sp":-7.0,"tot":239.5,"pm":6.9,"pt":240.2,"rm":4.0,"rt":236.0},{"id":401909845,"tip":"2026-10-23T23:00:00+00:00","home":"ORL","away":"MIN","hn":"Orlando Magic","an":"Minnesota Timberwolves","final":true,"hs":93,"as_":115,"sp":-1.5,"tot":234.5,"pm":1.4,"pt":235.7,"rm":2.0,"rt":226.4},{"id":401909846,"tip":"2026-10-23T23:00:00+00:00","home":"WSH","away":"TOR","hn":"Washington Wizards","an":"Toronto Raptors","final":true,"hs":102,"as_":112,"sp":8.5,"tot":237.0,"pm":-8.8,"pt":237.8,"rm":-7.8,"rt":232.4},{"id":401909847,"tip":"2026-10-24T00:00:00+00:00","home":"MIA","away":"DET","hn":"Miami Heat","an":"Detroit Pistons","final":true,"hs":111,"as_":128,"sp":1.5,"tot":235.0,"pm":-1.7,"pt":235.6,"rm":-0.9,"rt":230.6},{"id":401909096,"tip":"2026-10-24T01:30:00+00:00","home":"SA","away":"HOU","hn":"San Antonio Spurs","an":"Houston Rockets","final":true,"hs":110,"as_":114,"sp":-5.0,"tot":224.5,"pm":5.0,"pt":225.3,"rm":2.9,"rt":221.6},{"id":401909849,"tip":"2026-10-24T01:30:00+00:00","home":"UTAH","away":"NO","hn":"Utah Jazz","an":"New Orleans Pelicans","final":true,"hs":120,"as_":119,"sp":-1.0,"tot":239.5,"pm":0.8,"pt":239.9,"rm":-1.4,"rt":237.7},{"id":401909850,"tip":"2026-10-24T02:00:00+00:00","home":"GS","away":"MEM","hn":"Golden State Warriors","an":"Memphis Grizzlies","final":true,"hs":108,"as_":111,"sp":-4.5,"tot":237.5,"pm":4.5,"pt":238.7,"rm":5.7,"rt":233.2},{"id":401909851,"tip":"2026-10-24T02:00:00+00:00","home":"LAL","away":"LAC","hn":"Los Angeles Lakers","an":"LA Clippers","final":true,"hs":125,"as_":117,"sp":-8.5,"tot":225.5,"pm":8.4,"pt":226.3,"rm":0.8,"rt":224.6},{"id":401909852,"tip":"2026-10-24T02:00:00+00:00","home":"SAC","away":"POR","hn":"Sacramento Kings","an":"Portland Trail Blazers","final":true,"hs":120,"as_":128,"sp":10.0,"tot":232.5,"pm":-10.2,"pt":233.9,"rm":-5.4,"rt":226.6},{"id":401909863,"tip":"2026-10-25T23:00:00+00:00","home":"NY","away":"ORL","hn":"New York Knicks","an":"Orlando Magic","final":true,"hs":102,"as_":111,"sp":-7.0,"tot":224.5,"pm":7.1,"pt":225.5,"rm":10.2,"rt":220.9},{"id":401909864,"tip":"2026-10-25T23:00:00+00:00","home":"MIN","away":"TOR","hn":"Minnesota Timberwolves","an":"Toronto Raptors","final":true,"hs":117,"as_":94,"sp":-3.5,"tot":228.75,"pm":3.4,"pt":229.2,"rm":-0.5,"rt":226.0},{"id":401909865,"tip":"2026-10-25T23:00:00+00:00","home":"OKC","away":"LAC","hn":"Oklahoma City Thunder","an":"LA Clippers","final":true,"hs":108,"as_":101,"sp":-16.5,"tot":223.5,"pm":16.5,"pt":223.7,"rm":5.0,"rt":225.0},{"id":401909866,"tip":"2026-10-25T23:30:00+00:00","home":"PHI","away":"DET","hn":"Philadelphia 76ers","an":"Detroit Pistons","final":true,"hs":93,"as_":106,"sp":2.0,"tot":228.5,"pm":-2.4,"pt":229.6,"rm":-4.5,"rt":223.1},{"id":401909867,"tip":"2026-10-26T01:00:00+00:00","home":"SAC","away":"MEM","hn":"Sacramento Kings","an":"Memphis Grizzlies","final":true,"hs":112,"as_":123,"sp":3.5,"tot":234.5,"pm":-3.6,"pt":235.4,"rm":2.7,"rt":233.8},{"id":401909868,"tip":"2026-10-26T23:00:00+00:00","home":"CHA","away":"WSH","hn":"Charlotte Hornets","an":"Washington Wizards","final":true,"hs":110,"as_":103,"sp":-3.0,"tot":228.0,"pm":3.1,"pt":228.4,"rm":11.9,"rt":230.1},{"id":401909869,"tip":"2026-10-26T23:00:00+00:00","home":"CLE","away":"MIN","hn":"Cleveland Cavaliers","an":"Minnesota Timberwolves","final":true,"hs":127,"as_":125,"sp":-3.5,"tot":234.0,"pm":3.6,"pt":235.8,"rm":2.0,"rt":226.7},{"id":401909870,"tip":"2026-10-26T23:30:00+00:00","home":"BOS","away":"CHI","hn":"Boston Celtics","an":"Chicago Bulls","final":true,"hs":134,"as_":99,"sp":-14.0,"tot":233.0,"pm":14.2,"pt":233.8,"rm":11.0,"rt":229.4},{"id":401909871,"tip":"2026-10-26T23:30:00+00:00","home":"MIA","away":"DAL","hn":"Miami Heat","an":"Dallas Mavericks","final":true,"hs":109,"as_":113,"sp":-7.5,"tot":240.5,"pm":7.5,"pt":240.8,"rm":5.7,"rt":238.0},{"id":401909872,"tip":"2026-10-27T00:00:00+00:00","home":"MIL","away":"IND","hn":"Milwaukee Bucks","an":"Indiana Pacers","final":true,"hs":110,"as_":102,"sp":4.5,"tot":238.5,"pm":-4.4,"pt":240.3,"rm":1.3,"rt":234.0},{"id":401909873,"tip":"2026-10-27T00:00:00+00:00","home":"OKC","away":"PHX","hn":"Oklahoma City Thunder","an":"Phoenix Suns","final":true,"hs":125,"as_":114,"sp":-8.5,"tot":221.5,"pm":8.3,"pt":222.1,"rm":8.2,"rt":223.0},{"id":401909874,"tip":"2026-10-27T00:30:00+00:00","home":"HOU","away":"ATL","hn":"Houston Rockets","an":"Atlanta Hawks","final":true,"hs":120,"as_":110,"sp":-4.5,"tot":229.5,"pm":4.4,"pt":230.2,"rm":4.4,"rt":226.0},{"id":401909875,"tip":"2026-10-27T01:00:00+00:00","home":"UTAH","away":"MEM","hn":"Utah Jazz","an":"Memphis Grizzlies","final":true,"hs":105,"as_":110,"sp":1.0,"tot":237.5,"pm":-1.1,"pt":238.4,"rm":2.4,"rt":238.9},{"id":401909876,"tip":"2026-10-27T02:00:00+00:00","home":"DEN","away":"GS","hn":"Denver Nuggets","an":"Golden State Warriors","final":true,"hs":114,"as_":134,"sp":-7.0,"tot":236.5,"pm":7.0,"pt":237.4,"rm":7.8,"rt":232.0},{"id":401909877,"tip":"2026-10-27T23:30:00+00:00","home":"BOS","away":"BKN","hn":"Boston Celtics","an":"Brooklyn Nets","final":true,"hs":125,"as_":124,"sp":-12.5,"tot":223.5,"pm":12.4,"pt":224.7,"rm":13.8,"rt":222.5},{"id":401909878,"tip":"2026-10-28T00:00:00+00:00","home":"NY","away":"DET","hn":"New York Knicks","an":"Detroit Pistons","final":true,"hs":111,"as_":97,"sp":-4.0,"tot":219.5,"pm":3.9,"pt":220.1,"rm":3.2,"rt":219.1},{"id":401909879,"tip":"2026-10-28T00:00:00+00:00","home":"SA","away":"SAC","hn":"San Antonio Spurs","an":"Sacramento Kings","final":true,"hs":130,"as_":103,"sp":-18.5,"tot":232.5,"pm":18.7,"pt":233.7,"rm":12.2,"rt":227.2},{"id":401909880,"tip":"2026-10-28T03:00:00+00:00","home":"LAL","away":"POR","hn":"Los Angeles Lakers","an":"Portland Trail Blazers","final":true,"hs":129,"as_":136,"sp":-2.0,"tot":233.5,"pm":1.7,"pt":234.8,"rm":1.8,"rt":224.8},{"id":401909881,"tip":"2026-10-28T23:00:00+00:00","home":"ATL","away":"MIA","hn":"Atlanta Hawks","an":"Miami Heat","final":true,"hs":117,"as_":129,"sp":-2.5,"tot":242.0,"pm":2.5,"pt":242.7,"rm":4.9,"rt":234.3},{"id":401909882,"tip":"2026-10-28T23:00:00+00:00","home":"CLE","away":"WSH","hn":"Cleveland Cavaliers","an":"Washington Wizards","final":true,"hs":121,"as_":111,"sp":-9.5,"tot":240.0,"pm":9.5,"pt":241.2,"rm":8.1,"rt":232.4},{"id":401909883,"tip":"2026-10-28T23:00:00+00:00","home":"DET","away":"CHA","hn":"Detroit Pistons","an":"Charlotte Hornets","final":true,"hs":97,"as_":89,"sp":-7.5,"tot":213.0,"pm":7.2,"pt":213.0,"rm":1.1,"rt":220.4},{"id":401909884,"tip":"2026-10-28T23:00:00+00:00","home":"IND","away":"PHI","hn":"Indiana Pacers","an":"Philadelphia 76ers","final":true,"hs":109,"as_":114,"sp":7.5,"tot":234.0,"pm":-7.7,"pt":235.1,"rm":1.9,"rt":228.7},{"id":401909885,"tip":"2026-10-28T23:30:00+00:00","home":"TOR","away":"ORL","hn":"Toronto Raptors","an":"Orlando Magic","final":true,"hs":129,"as_":99,"sp":-4.5,"tot":224.5,"pm":4.5,"pt":225.0,"rm":6.6,"rt":223.9},{"id":401909886,"tip":"2026-10-29T00:00:00+00:00","home":"CHI","away":"NY","hn":"Chicago Bulls","an":"New York Knicks","final":true,"hs":127,"as_":133,"sp":7.5,"tot":232.0,"pm":-7.6,"pt":233.3,"rm":-6.8,"rt":228.4},{"id":401909887,"tip":"2026-10-29T00:00:00+00:00","home":"MIL","away":"HOU","hn":"Milwaukee Bucks","an":"Houston Rockets","final":true,"hs":100,"as_":132,"sp":8.5,"tot":226.5,"pm":-8.7,"pt":227.3,"rm":-6.1,"rt":226.7},{"id":401909888,"tip":"2026-10-29T00:00:00+00:00","home":"MIN","away":"GS","hn":"Minnesota Timberwolves","an":"Golden State Warriors","final":true,"hs":114,"as_":119,"sp":-4.0,"tot":227.5,"pm":4.0,"pt":227.7,"rm":6.5,"rt":229.8},{"id":401909889,"tip":"2026-10-29T00:00:00+00:00","home":"NO","away":"DEN","hn":"New Orleans Pelicans","an":"Denver Nuggets","final":true,"hs":91,"as_":104,"sp":4.5,"tot":240.5,"pm":-4.5,"pt":240.9,"rm":0.0,"rt":236.5},{"id":401909890,"tip":"2026-10-29T01:00:00+00:00","home":"UTAH","away":"SA","hn":"Utah Jazz","an":"San Antonio Spurs","final":true,"hs":111,"as_":117,"sp":13.5,"tot":233.5,"pm":-13.5,"pt":234.5,"rm":-5.5,"rt":231.9},{"id":401909891,"tip":"2026-10-29T01:30:00+00:00","home":"DAL","away":"OKC","hn":"Dallas Mavericks","an":"Oklahoma City Thunder","final":true,"hs":120,"as_":96,"sp":5.5,"tot":228.0,"pm":-5.7,"pt":228.2,"rm":-6.2,"rt":228.9},{"id":401909892,"tip":"2026-10-29T02:30:00+00:00","home":"LAC","away":"LAL","hn":"LA Clippers","an":"Los Angeles Lakers","final":true,"hs":87,"as_":103,"sp":-1.0,"tot":224.5,"pm":1.2,"pt":225.4,"rm":5.3,"rt":228.0},{"id":401909895,"tip":"2026-10-30T02:00:00+00:00","home":"POR","away":"MEM","hn":"Portland Trail Blazers","an":"Memphis Grizzlies","final":true,"hs":103,"as_":124,"sp":-7.5,"tot":234.5,"pm":7.5,"pt":235.2,"rm":9.8,"rt":230.7},{"id":401909277,"tip":"2026-10-30T23:00:00+00:00","home":"WSH","away":"CHA","hn":"Washington Wizards","an":"Charlotte Hornets","final":true,"hs":95,"as_":79,"sp":-1.5,"tot":235.5,"pm":1.2,"pt":237.0,"rm":-6.4,"rt":227.9},{"id":401909278,"tip":"2026-10-30T23:30:00+00:00","home":"BOS","away":"CHI","hn":"Boston Celtics","an":"Chicago Bulls","final":true,"hs":125,"as_":111,"sp":-11.5,"tot":232.5,"pm":11.7,"pt":232.8,"rm":13.2,"rt":231.4},{"id":401909279,"tip":"2026-10-30T23:30:00+00:00","home":"BKN","away":"DET","hn":"Brooklyn Nets","an":"Detroit Pistons","final":true,"hs":94,"as_":110,"sp":7.5,"tot":225.5,"pm":-7.7,"pt":226.9,"rm":-8.8,"rt":221.9},{"id":401909280,"tip":"2026-10-30T23:30:00+00:00","home":"PHI","away":"NY","hn":"Philadelphia 76ers","an":"New York Knicks","final":true,"hs":98,"as_":93,"sp":-2.5,"tot":231.5,"pm":2.3,"pt":233.0,"rm":-4.3,"rt":221.6},{"id":401909281,"tip":"2026-10-30T23:30:00+00:00","home":"TOR","away":"ORL","hn":"Toronto Raptors","an":"Orlando Magic","final":true,"hs":114,"as_":121,"sp":-3.5,"tot":226.5,"pm":3.5,"pt":227.1,"rm":9.0,"rt":224.2},{"id":401909282,"tip":"2026-10-31T00:00:00+00:00","home":"MIA","away":"IND","hn":"Miami Heat","an":"Indiana Pacers","final":true,"hs":145,"as_":125,"sp":-3.5,"tot":241.5,"pm":3.5,"pt":242.0,"rm":4.7,"rt":236.5},{"id":401909283,"tip":"2026-10-31T00:00:00+00:00","home":"DAL","away":"HOU","hn":"Dallas Mavericks","an":"Houston Rockets","final":true,"hs":116,"as_":111,"sp":4.5,"tot":227.5,"pm":-4.7,"pt":227.7,"rm":-4.7,"rt":229.0},{"id":401909284,"tip":"2026-10-31T00:00:00+00:00","home":"MIN","away":"LAC","hn":"Minnesota Timberwolves","an":"LA Clippers","final":true,"hs":127,"as_":101,"sp":-9.5,"tot":230.5,"pm":9.4,"pt":231.2,"rm":2.9,"rt":226.3},{"id":401909285,"tip":"2026-10-31T02:00:00+00:00","home":"GS","away":"LAL","hn":"Golden State Warriors","an":"Los Angeles Lakers","final":true,"hs":112,"as_":95,"sp":1.5,"tot":236.5,"pm":-1.7,"pt":237.8,"rm":-1.3,"rt":228.9},{"id":401909286,"tip":"2026-10-31T02:00:00+00:00","home":"PHX","away":"DEN","hn":"Phoenix Suns","an":"Denver Nuggets","final":true,"hs":120,"as_":127,"sp":2.5,"tot":233.5,"pm":-2.5,"pt":234.6,"rm":-1.6,"rt":229.1},{"id":401909922,"tip":"2026-11-05T00:00:00+00:00","home":"DET","away":"PHI","hn":"Detroit Pistons","an":"Philadelphia 76ers","final":true,"hs":106,"as_":112,"sp":-2.5,"tot":217.5,"pm":2.5,"pt":218.0,"rm":8.1,"rt":219.2},{"id":401909923,"tip":"2026-11-05T00:00:00+00:00","home":"WSH","away":"ATL","hn":"Washington Wizards","an":"Atlanta Hawks","final":true,"hs":105,"as_":120,"sp":1.5,"tot":233.5,"pm":-1.7,"pt":234.3,"rm":-1.7,"rt":229.7},{"id":401909924,"tip":"2026-11-05T00:30:00+00:00","home":"BOS","away":"MIL","hn":"Boston Celtics","an":"Milwaukee Bucks","final":true,"hs":109,"as_":102,"sp":-11.5,"tot":223.5,"pm":11.6,"pt":224.3,"rm":13.9,"rt":225.9},{"id":401909925,"tip":"2026-11-05T00:30:00+00:00","home":"BKN","away":"CHA","hn":"Brooklyn Nets","an":"Charlotte Hornets","final":true,"hs":114,"as_":104,"sp":3.5,"tot":212.5,"pm":-3.7,"pt":213.5,"rm":-4.5,"rt":218.5},{"id":401909926,"tip":"2026-11-05T00:30:00+00:00","home":"NY","away":"CHI","hn":"New York Knicks","an":"Chicago Bulls","final":true,"hs":135,"as_":105,"sp":-12.5,"tot":233.5,"pm":12.6,"pt":234.4,"rm":14.6,"rt":228.0},{"id":401909929,"tip":"2026-11-05T01:00:00+00:00","home":"OKC","away":"CLE","hn":"Oklahoma City Thunder","an":"Cleveland Cavaliers","final":true,"hs":124,"as_":116,"sp":-1.5,"tot":228.5,"pm":1.4,"pt":229.2,"rm":4.6,"rt":226.1},{"id":401909930,"tip":"2026-11-05T01:30:00+00:00","home":"HOU","away":"MIN","hn":"Houston Rockets","an":"Minnesota Timberwolves","final":true,"hs":107,"as_":117,"sp":-7.5,"tot":220.5,"pm":7.5,"pt":220.3,"rm":6.0,"rt":224.9},{"id":401909931,"tip":"2026-11-05T02:00:00+00:00","home":"DEN","away":"TOR","hn":"Denver Nuggets","an":"Toronto Raptors","final":true,"hs":128,"as_":109,"sp":-5.5,"tot":231.5,"pm":5.4,"pt":231.7,"rm":0.7,"rt":230.9},{"id":401909932,"tip":"2026-11-05T02:00:00+00:00","home":"PHX","away":"POR","hn":"Phoenix Suns","an":"Portland Trail Blazers","final":true,"hs":119,"as_":132,"sp":3.5,"tot":228.0,"pm":-3.7,"pt":228.8,"rm":-3.2,"rt":226.6},{"id":401909933,"tip":"2026-11-05T02:30:00+00:00","home":"SA","away":"DAL","hn":"San Antonio Spurs","an":"Dallas Mavericks","final":true,"hs":112,"as_":111,"sp":-11.5,"tot":227.5,"pm":11.6,"pt":227.6,"rm":10.9,"rt":228.2},{"id":401909934,"tip":"2026-11-05T03:00:00+00:00","home":"SAC","away":"LAL","hn":"Sacramento Kings","an":"Los Angeles Lakers","final":true,"hs":103,"as_":116,"sp":11.5,"tot":238.0,"pm":-11.7,"pt":239.3,"rm":-6.2,"rt":230.8},{"id":401909936,"tip":"2026-11-06T02:00:00+00:00","home":"PHX","away":"ORL","hn":"Phoenix Suns","an":"Orlando Magic","final":true,"hs":117,"as_":104,"sp":-1.5,"tot":222.5,"pm":1.1,"pt":223.3,"rm":0.3,"rt":225.2},{"id":401909937,"tip":"2026-11-06T03:00:00+00:00","home":"GS","away":"MIA","hn":"Golden State Warriors","an":"Miami Heat","final":true,"hs":120,"as_":100,"sp":-3.5,"tot":235.5,"pm":3.7,"pt":236.1,"rm":5.0,"rt":237.3},{"id":401909287,"tip":"2026-11-07T00:00:00+00:00","home":"ATL","away":"WSH","hn":"Atlanta Hawks","an":"Washington Wizards","final":true,"hs":139,"as_":132,"sp":-8.0,"tot":228.5,"pm":8.0,"pt":228.9,"rm":8.1,"rt":229.5},{"id":401909288,"tip":"2026-11-07T00:00:00+00:00","home":"CHA","away":"BOS","hn":"Charlotte Hornets","an":"Boston Celtics","final":true,"hs":80,"as_":119,"sp":10.5,"tot":208.0,"pm":-10.7,"pt":208.2,"rm":-2.3,"rt":218.5},{"id":401909289,"tip":"2026-11-07T00:30:00+00:00","home":"CLE","away":"PHI","hn":"Cleveland Cavaliers","an":"Philadelphia 76ers","final":true,"hs":119,"as_":95,"sp":2.5,"tot":231.5,"pm":-2.6,"pt":232.6,"rm":2.5,"rt":226.0},{"id":401909290,"tip":"2026-11-07T01:00:00+00:00","home":"DAL","away":"UTAH","hn":"Dallas Mavericks","an":"Utah Jazz","final":true,"hs":112,"as_":100,"sp":-6.5,"tot":225.5,"pm":6.5,"pt":225.1,"rm":6.7,"rt":234.1},{"id":401909291,"tip":"2026-11-07T01:00:00+00:00","home":"MEM","away":"OKC","hn":"Memphis Grizzlies","an":"Oklahoma City Thunder","final":true,"hs":97,"as_":128,"sp":4.5,"tot":223.5,"pm":-4.7,"pt":223.2,"rm":-1.9,"rt":229.6},{"id":401909292,"tip":"2026-11-07T01:00:00+00:00","home":"MIL","away":"TOR","hn":"Milwaukee Bucks","an":"Toronto Raptors","final":true,"hs":107,"as_":121,"sp":4.5,"tot":229.0,"pm":-4.8,"pt":229.7,"rm":-6.3,"rt":229.4},{"id":401909293,"tip":"2026-11-07T01:00:00+00:00","home":"NO","away":"MIN","hn":"New Orleans Pelicans","an":"Minnesota Timberwolves","final":true,"hs":109,"as_":115,"sp":3.5,"tot":230.5,"pm":-3.6,"pt":230.1,"rm":-0.3,"rt":232.7},{"id":401909294,"tip":"2026-11-07T03:00:00+00:00","home":"LAL","away":"POR","hn":"Los Angeles Lakers","an":"Portland Trail Blazers","final":true,"hs":124,"as_":118,"sp":-3.0,"tot":231.5,"pm":2.9,"pt":232.1,"rm":2.0,"rt":227.6},{"id":401909295,"tip":"2026-11-07T03:00:00+00:00","home":"SAC","away":"SA","hn":"Sacramento Kings","an":"San Antonio Spurs","final":true,"hs":109,"as_":124,"sp":17.5,"tot":231.5,"pm":-17.8,"pt":232.3,"rm":-9.7,"rt":228.1},{"id":401909952,"tip":"2026-11-10T00:00:00+00:00","home":"ATL","away":"LAL","hn":"Atlanta Hawks","an":"Los Angeles Lakers","final":true,"hs":114,"as_":124,"sp":-2.5,"tot":233.5,"pm":2.6,"pt":234.4,"rm":2.8,"rt":231.6},{"id":401909953,"tip":"2026-11-10T00:00:00+00:00","home":"CHA","away":"CLE","hn":"Charlotte Hornets","an":"Cleveland Cavaliers","final":true,"hs":124,"as_":112,"sp":8.5,"tot":215.0,"pm":-8.6,"pt":215.5,"rm":-0.5,"rt":221.6},{"id":401909954,"tip":"2026-11-10T00:00:00+00:00","home":"DET","away":"WSH","hn":"Detroit Pistons","an":"Washington Wizards","final":true,"hs":122,"as_":111,"sp":-10.5,"tot":219.5,"pm":10.4,"pt":219.9,"rm":11.7,"rt":223.8},{"id":401909955,"tip":"2026-11-10T00:30:00+00:00","home":"TOR","away":"MEM","hn":"Toronto Raptors","an":"Memphis Grizzlies","final":true,"hs":102,"as_":118,"sp":1.5,"tot":226.5,"pm":-1.5,"pt":226.2,"rm":8.1,"rt":232.2},{"id":401909956,"tip":"2026-11-10T01:00:00+00:00","home":"DAL","away":"IND","hn":"Dallas Mavericks","an":"Indiana Pacers","final":true,"hs":125,"as_":122,"sp":-4.0,"tot":226.5,"pm":3.7,"pt":226.6,"rm":4.5,"rt":230.0},{"id":401909957,"tip":"2026-11-10T01:30:00+00:00","home":"HOU","away":"DEN","hn":"Houston Rockets","an":"Denver Nuggets","final":true,"hs":110,"as_":100,"sp":-4.5,"tot":223.5,"pm":4.5,"pt":223.6,"rm":4.8,"rt":226.8},{"id":401909958,"tip":"2026-11-10T02:00:00+00:00","home":"PHX","away":"SA","hn":"Phoenix Suns","an":"San Antonio Spurs","final":true,"hs":96,"as_":122,"sp":8.5,"tot":226.0,"pm":-8.7,"pt":226.4,"rm":-6.2,"rt":225.9},{"id":401909959,"tip":"2026-11-10T03:00:00+00:00","home":"GS","away":"NO","hn":"Golden State Warriors","an":"New Orleans Pelicans","final":true,"hs":138,"as_":87,"sp":-11.5,"tot":229.5,"pm":11.7,"pt":229.6,"rm":6.9,"rt":236.0},{"id":401909960,"tip":"2026-11-11T00:30:00+00:00","home":"NY","away":"MIL","hn":"New York Knicks","an":"Milwaukee Bucks","final":false,"hs":null,"as_":null,"sp":-15.5,"tot":220.0,"pm":15.8,"pt":220.8,"rm":17.0,"rt":222.8},{"id":401909961,"tip":"2026-11-11T01:00:00+00:00","home":"PHI","away":"BOS","hn":"Philadelphia 76ers","an":"Boston Celtics","final":false,"hs":null,"as_":null,"sp":1.5,"tot":217.5,"pm":-1.7,"pt":217.9,"rm":-4.5,"rt":220.9},{"id":401909962,"tip":"2026-11-11T02:00:00+00:00","home":"PHX","away":"LAC","hn":"Phoenix Suns","an":"LA Clippers","final":false,"hs":null,"as_":null,"sp":null,"tot":null,"pm":null,"pt":null,"rm":-2.4,"rt":227.9},{"id":401909963,"tip":"2026-11-11T02:00:00+00:00","home":"UTAH","away":"MIA","hn":"Utah Jazz","an":"Miami Heat","final":false,"hs":null,"as_":null,"sp":9.5,"tot":227.5,"pm":-9.7,"pt":226.8,"rm":-3.5,"rt":236.8},{"id":401909964,"tip":"2026-11-11T03:00:00+00:00","home":"SAC","away":"ORL","hn":"Sacramento Kings","an":"Orlando Magic","final":false,"hs":null,"as_":null,"sp":6.0,"tot":222.0,"pm":-6.2,"pt":222.6,"rm":-1.1,"rt":227.7},{"id":401909965,"tip":"2026-11-11T04:00:00+00:00","home":"POR","away":"OKC","hn":"Portland Trail Blazers","an":"Oklahoma City Thunder","final":false,"hs":null,"as_":null,"sp":1.5,"tot":226.75,"pm":-1.7,"pt":227.1,"rm":-1.3,"rt":225.0},{"id":401909966,"tip":"2026-11-12T00:00:00+00:00","home":"IND","away":"WSH","hn":"Indiana Pacers","an":"Washington Wizards","final":false,"hs":null,"as_":null,"sp":null,"tot":null,"pm":null,"pt":null,"rm":5.7,"rt":230.6},{"id":401909967,"tip":"2026-11-12T00:00:00+00:00","home":"NY","away":"CLE","hn":"New York Knicks","an":"Cleveland Cavaliers","final":false,"hs":null,"as_":null,"sp":null,"tot":null,"pm":null,"pt":null,"rm":7.4,"rt":222.6},{"id":401909968,"tip":"2026-11-12T00:00:00+00:00","home":"TOR","away":"BOS","hn":"Toronto Raptors","an":"Boston Celtics","final":false,"hs":null,"as_":null,"sp":null,"tot":null,"pm":null,"pt":null,"rm":-0.5,"rt":224.5},{"id":401909969,"tip":"2026-11-12T01:00:00+00:00","home":"CHI","away":"SA","hn":"Chicago Bulls","an":"San Antonio Spurs","final":false,"hs":null,"as_":null,"sp":null,"tot":null,"pm":null,"pt":null,"rm":-12.4,"rt":232.5},{"id":401909970,"tip":"2026-11-12T01:00:00+00:00","home":"MEM","away":"DEN","hn":"Memphis Grizzlies","an":"Denver Nuggets","final":false,"hs":null,"as_":null,"sp":null,"tot":null,"pm":null,"pt":null,"rm":-1.2,"rt":232.8},{"id":401909971,"tip":"2026-11-12T01:00:00+00:00","home":"MIL","away":"LAL","hn":"Milwaukee Bucks","an":"Los Angeles Lakers","final":false,"hs":null,"as_":null,"sp":null,"tot":null,"pm":null,"pt":null,"rm":-10.2,"rt":229.1},{"id":401909972,"tip":"2026-11-12T01:00:00+00:00","home":"NO","away":"BKN","hn":"New Orleans Pelicans","an":"Brooklyn Nets","final":false,"hs":null,"as_":null,"sp":null,"tot":null,"pm":null,"pt":null,"rm":6.7,"rt":230.3},{"id":401909973,"tip":"2026-11-12T02:00:00+00:00","home":"UTAH","away":"ORL","hn":"Utah Jazz","an":"Orlando Magic","final":false,"hs":null,"as_":null,"sp":null,"tot":null,"pm":null,"pt":null,"rm":-0.8,"rt":228.7},{"id":401909974,"tip":"2026-11-12T02:30:00+00:00","home":"HOU","away":"GS","hn":"Houston Rockets","an":"Golden State Warriors","final":false,"hs":null,"as_":null,"sp":null,"tot":null,"pm":null,"pt":null,"rm":4.0,"rt":225.9},{"id":401909975,"tip":"2026-11-12T03:00:00+00:00","home":"POR","away":"OKC","hn":"Portland Trail Blazers","an":"Oklahoma City Thunder","final":false,"hs":null,"as_":null,"sp":null,"tot":null,"pm":null,"pt":null,"rm":-1.0,"rt":225.3},{"id":401909976,"tip":"2026-11-13T00:00:00+00:00","home":"PHI","away":"TOR","hn":"Philadelphia 76ers","an":"Toronto Raptors","final":false,"hs":null,"as_":null,"sp":null,"tot":null,"pm":null,"pt":null,"rm":2.7,"rt":226.4},{"id":401909977,"tip":"2026-11-13T00:00:00+00:00","home":"WSH","away":"DET","hn":"Washington Wizards","an":"Detroit Pistons","final":false,"hs":null,"as_":null,"sp":null,"tot":null,"pm":null,"pt":null,"rm":-10.4,"rt":224.4},{"id":401909978,"tip":"2026-11-13T01:00:00+00:00","home":"MIN","away":"DAL","hn":"Minnesota Timberwolves","an":"Dallas Mavericks","final":false,"hs":null,"as_":null,"sp":null,"tot":null,"pm":null,"pt":null,"rm":5.8,"rt":229.2},{"id":401909979,"tip":"2026-11-13T02:00:00+00:00","home":"PHX","away":"CHA","hn":"Phoenix Suns","an":"Charlotte Hornets","final":false,"hs":null,"as_":null,"sp":null,"tot":null,"pm":null,"pt":null,"rm":1.0,"rt":221.5}],"sd":{"m":13.54,"t":18.03,"rm":12.53,"rt":18.88}}, $ = function(i){return document.getElementById(i)};
+var KEY = "courtline-bets", bets = [], stored = true, editing = null;
+try { bets = JSON.parse(localStorage.getItem(KEY) || "[]"); if (!Array.isArray(bets)) bets = []; } catch (e) { stored = false; bets = []; }
+function save(){ try { localStorage.setItem(KEY, JSON.stringify(bets)); } catch (e) { stored = false; } }
+var G = {}; D.games.forEach(function(g){ G[g.id] = g; });
+function esc(s){ return String(s == null ? "" : s).replace(/[&<>"']/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
+function etDate(ts, opt){ return new Date(ts).toLocaleString("en-US", Object.assign({ timeZone: "America/New_York" }, opt)); }
+function gameLabel(g){ return etDate(g.tip, {month:"short", day:"numeric"}) + " · " + g.an + " at " + g.hn; }
+// game picker: upcoming first, then finals (most recent first)
+var up = D.games.filter(function(g){return !g.final}).sort(function(a,b){return a.tip<b.tip?-1:1});
+var fin = D.games.filter(function(g){return g.final}).sort(function(a,b){return a.tip<b.tip?1:-1});
+$("f-game").innerHTML = (up.length ? '<optgroup label="Upcoming">' + up.map(function(g){return '<option value="'+g.id+'">'+esc(gameLabel(g))+'</option>'}).join("") + '</optgroup>' : "") +
+  '<optgroup label="Final">' + fin.map(function(g){return '<option value="'+g.id+'">'+esc(gameLabel(g))+' (final)</option>'}).join("") + '</optgroup>' +
+  '<option value="other">Another game (no Courtline number)</option>';
+function selGame(){ var v = $("f-game").value; return v === "other" ? null : G[v]; }
+function fillTeams(keep){
+  var g = selGame(), cur = keep || $("f-team").value;
+  $("f-desc-w").hidden = !!g;
+  $("f-team").innerHTML = g ? ['away','home'].map(function(s){ var ab = g[s], nm = s==='home'?g.hn:g.an; return '<option value="'+ab+'">'+esc(nm)+'</option>'; }).join("")
+    : '<option value="A">Team A</option><option value="B">Team B</option>';
+  if (cur && Array.prototype.some.call($("f-team").options, function(o){return o.value===cur})) $("f-team").value = cur;
+}
+function setLabels(){
+  var m = $("f-market").value;
+  $("f-team-w").hidden = (m === "over" || m === "under");
+  $("f-line-w").hidden = (m === "ml");
+  $("f-line-l").textContent = m === "spread" ? "Line (your side, e.g. +3.5)" : "Total (e.g. 226.5)";
+  $("f-odds-l").textContent = CL.format() === "dec" ? "Odds (decimal, e.g. 1.91)" : "Odds (American, e.g. \u2212110)";
+}
+function readOdds(){
+  var v = $("f-odds").value; if (v === "" || isNaN(+v)) return null;
+  v = +v;
+  if (CL.format() === "dec") return v > 1 ? CL.toAm(v) : null;
+  return (v >= 100 || v <= -100) ? v : null;
+}
+function showOdds(am){ if (am == null) return ""; return CL.format() === "dec" ? CL.toDec(am).toFixed(2) : String(Math.round(am)); }
+function chance(b){
+  var g = G[b.game]; if (!g) return null;
+  var m = g.pm != null ? g.pm : g.rm, sm = g.pm != null ? D.sd.m : D.sd.rm;
+  var t = g.pt != null ? g.pt : g.rt, st = g.pt != null ? D.sd.t : D.sd.rt;
+  if (b.market === "spread") { if (b.line == null) return null; return b.team === g.home ? CL.phi((m + b.line)/sm) : CL.phi((b.line - m)/sm); }
+  if (b.market === "over") { if (b.line == null) return null; return CL.phi((t - b.line)/st); }
+  if (b.market === "under") { if (b.line == null) return null; return 1 - CL.phi((t - b.line)/st); }
+  if (b.market === "ml") { var ph = CL.phi(m/sm); return b.team === g.home ? ph : 1 - ph; }
+  return null;
+}
+function readForm(){
+  var g = selGame(), m = $("f-market").value, line = $("f-line").value;
+  return { id: editing || ("b" + Date.now().toString(36)), game: g ? g.id : null, desc: g ? gameLabel(g) : $("f-desc").value.trim(),
+    market: m, team: (m === "over" || m === "under") ? null : $("f-team").value,
+    teamName: (m === "over" || m === "under") ? null : $("f-team").options[$("f-team").selectedIndex].text,
+    line: (m === "ml" || line === "" || isNaN(+line)) ? null : +line, odds: readOdds(), stake: +$("f-stake").value || 0,
+    result: $("f-result").value, kind: $("f-kind").value, notes: $("f-notes").value.trim(), tip: g ? g.tip : null };
+}
+function pickText(b){
+  var s = b.market === "spread" ? (b.teamName + " " + (b.line > 0 ? "+" : b.line < 0 ? "\u2212" : "") + Math.abs(b.line)) :
+    b.market === "ml" ? (b.teamName + " moneyline") : ((b.market === "over" ? "Over " : "Under ") + b.line);
+  return s;
+}
+function meterHTML(b){
+  var c = chance(b), be = b.odds != null ? CL.implied(b.odds) : null;
+  if (c == null && be == null) return '<p class="m-text muted">Pick a game, a bet and a price to see the meter.</p>';
+  var h = '<div class="m-bar">' + (be != null ? '<span class="m-be" style="left:'+(100*be).toFixed(1)+'%" title="Breakeven"></span>' : '') +
+          (c != null ? '<span class="m-mark" style="left:'+(100*c).toFixed(1)+'%" title="Courtline"></span>' : '') + '</div>' +
+          '<div class="m-scale"><span>Long shot</span><span>Coin flip</span><span>Safe</span></div>';
+  var t = "";
+  if (c != null) t += 'Courtline gives this <strong>' + (100*c).toFixed(1) + '%</strong>. ';
+  else t += 'No Courtline number for this game. ';
+  if (be != null) t += 'The price needs ' + (100*be).toFixed(1) + '% to break even. ';
+  if (c != null && be != null) { var d = 100*(c - be); t += d >= 0 ? '<strong class="good">Courtline\u2019s chance beats the price by ' + d.toFixed(1) + ' points.</strong>' : '<strong class="bad">The price asks ' + (-d).toFixed(1) + ' points more than Courtline\u2019s chance.</strong>'; }
+  return h + '<p class="m-text">' + t + '</p>';
+}
+function update(){ $("meter").innerHTML = meterHTML(readForm()); }
+function autoGrade(b){
+  var g = G[b.game]; if (!g || !g.final || b.result !== "pending") return;
+  var m = g.hs - g.as_, tot = g.hs + g.as_, r = null;
+  if (b.market === "spread" && b.line != null) { var x = (b.team === g.home ? m : -m) + b.line; r = x > 0 ? "win" : x < 0 ? "loss" : "push"; }
+  else if ((b.market === "over" || b.market === "under") && b.line != null) { var y = (tot - b.line) * (b.market === "over" ? 1 : -1); r = y > 0 ? "win" : y < 0 ? "loss" : "push"; }
+  else if (b.market === "ml") { var w = b.team === g.home ? m > 0 : m < 0; r = m === 0 ? "push" : (w ? "win" : "loss"); }
+  if (r) { b.result = r; b.auto = true; }
+}
+function profit(b){ if (b.result === "win") return b.odds != null ? b.stake * (CL.toDec(b.odds) - 1) : 0; if (b.result === "loss") return -b.stake; return 0; }
+function money(v){ return (v < 0 ? "\u2212$" : "$") + Math.abs(v).toFixed(2); }
+function kpis(list){
+  var w = 0, l = 0, p = 0, st = 0, pr = 0, pend = 0;
+  list.forEach(function(b){ if (b.result === "pending") { pend++; return; } st += b.stake; pr += profit(b); if (b.result === "win") w++; else if (b.result === "loss") l++; else p++; });
+  return { w: w, l: l, p: p, st: st, pr: pr, pend: pend, roi: st ? 100 * pr / st : null };
+}
+function render(){
+  bets.forEach(autoGrade); save();
+  var real = bets.filter(function(b){return b.kind !== "sim"}), sim = bets.filter(function(b){return b.kind === "sim"});
+  var k = kpis(real);
+  $("kpis").innerHTML = '<div class="stat"><span class="big">'+k.w+'\u2013'+k.l+(k.p?'\u2013'+k.p:'')+'</span><span class="what">Record</span><span class="n">'+k.pend+' pending</span></div>'+
+    '<div class="stat"><span class="big">'+money(k.pr)+'</span><span class="what">Profit</span><span class="n">on '+money(k.st)+' staked</span></div>'+
+    '<div class="stat"><span class="big">'+(k.roi==null?'\u2013':k.roi.toFixed(1)+'%')+'</span><span class="what">Return on stake</span><span class="n">Real bets only</span></div>';
+  var ks = kpis(sim);
+  $("kpi-sim").textContent = sim.length ? ("Practice bets: " + ks.w + "\u2013" + ks.l + (ks.p ? "\u2013" + ks.p : "") + ", " + money(ks.pr) + " on " + money(ks.st) + " staked.") : "";
+  var list = bets.slice().sort(function(a,b){ return (b.tip||"") < (a.tip||"") ? -1 : 1; });
+  $("bets").innerHTML = list.length ? list.map(function(b){
+    var c = chance(b), pl = b.result === "pending" ? "" : money(profit(b));
+    return '<article class="bet"><div><div class="who">'+esc(pickText(b))+' <span class="muted">at</span> '+(b.odds!=null?'<span class="odds" data-am="'+b.odds+'">'+CL.fmt(b.odds)+'</span>':'\u2013')+'</div>'+
+      '<div class="meta">'+esc(b.desc)+' \u00b7 '+money(b.stake)+(b.kind==="sim"?' \u00b7 practice':'')+(c!=null?' \u00b7 Courtline '+(100*c).toFixed(1)+'%':'')+'</div>'+
+      (b.notes?'<div class="meta">'+esc(b.notes)+'</div>':'')+'</div>'+
+      '<div class="right"><span class="pill '+(b.result==="win"?"win":b.result==="loss"?"loss":"")+'">'+b.result+(b.auto?' \u00b7 auto':'')+'</span><span class="mono small">'+pl+'</span>'+
+      '<span class="acts"><button type="button" data-edit="'+b.id+'">Edit</button><button type="button" data-del="'+b.id+'">Delete</button></span></div></article>';
+  }).join("") : '<p class="empty">No bets yet. Log one above and it shows up here.</p>';
+  if (!stored) $("l-msg").textContent = "This browser is blocking storage, so bets last only until you close the page. Export to keep them.";
+}
+function resetForm(){ editing = null; $("f").reset(); $("f-stake").value = 20; $("f-cancel").hidden = true; $("f-save").textContent = "Save bet"; fillTeams(); setLabels(); prefillLine(); $("f-odds").value = showOdds(-110); update(); }
+$("f").addEventListener("submit", function(ev){
+  ev.preventDefault();
+  var b = readForm();
+  if (!b.game && !b.desc) { $("f-msg").textContent = "Pick a game or type one in."; return; }
+  if (b.market !== "ml" && b.line == null) { $("f-msg").textContent = "Enter the line you got."; return; }
+  if (b.odds == null) { $("f-msg").textContent = CL.format() === "dec" ? "Enter decimal odds above 1, like 1.91." : "Enter American odds like \u2212110 or +150."; return; }
+  if (b.result === "pending") b.auto = false;
+  var i = bets.findIndex(function(x){return x.id === b.id});
+  if (i >= 0) bets[i] = b; else bets.push(b);
+  render(); $("f-msg").textContent = i >= 0 ? "Bet updated." : "Bet saved."; resetForm();
+});
+$("f-cancel").addEventListener("click", function(){ resetForm(); $("f-msg").textContent = ""; });
+$("bets").addEventListener("click", function(ev){
+  var id = ev.target.getAttribute("data-edit"), del = ev.target.getAttribute("data-del");
+  if (del) {
+    if (ev.target.getAttribute("data-confirm")) { bets = bets.filter(function(x){return x.id !== del}); render(); $("l-msg").textContent = "Bet deleted."; }
+    else { ev.target.setAttribute("data-confirm", "1"); ev.target.textContent = "Tap again to delete"; }
+    return;
+  }
+  if (!id) return;
+  var b = bets.find(function(x){return x.id === id}); if (!b) return;
+  editing = b.id;
+  $("f-game").value = b.game ? String(b.game) : "other"; if (!b.game) $("f-desc").value = b.desc || "";
+  $("f-market").value = b.market; fillTeams(b.team); setLabels();
+  $("f-line").value = b.line == null ? "" : b.line; $("f-odds").value = showOdds(b.odds); $("f-stake").value = b.stake;
+  $("f-result").value = b.result; $("f-kind").value = b.kind; $("f-notes").value = b.notes || "";
+  $("f-cancel").hidden = false; $("f-save").textContent = "Update bet"; update();
+  $("f").scrollIntoView({ behavior: "smooth", block: "start" });
+});
+$("l-export").addEventListener("click", function(){
+  var blob = new Blob([JSON.stringify({ app: "courtline-bet-log", exported: new Date().toISOString(), bets: bets }, null, 1)], { type: "application/json" });
+  var a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "courtline-bets-" + new Date().toISOString().slice(0,10) + ".json";
+  document.body.appendChild(a); a.click(); a.remove(); $("l-msg").textContent = "Exported " + bets.length + " bets.";
+});
+$("l-import").addEventListener("click", function(){ $("l-file").click(); });
+$("l-file").addEventListener("change", function(){
+  var f = this.files[0]; if (!f) return;
+  var r = new FileReader();
+  r.onload = function(){
+    try { var d = JSON.parse(r.result), list = Array.isArray(d) ? d : d.bets; if (!Array.isArray(list)) throw 0;
+      var ids = {}; bets.forEach(function(b){ ids[b.id] = 1; }); var n = 0;
+      list.forEach(function(b){ if (b && b.id && !ids[b.id]) { bets.push(b); n++; } });
+      render(); $("l-msg").textContent = "Imported " + n + " new bets.";
+    } catch (e) { $("l-msg").textContent = "That file is not a Courtline bet export."; }
+  };
+  r.readAsText(f); this.value = "";
+});
+["f-game","f-market","f-team","f-line","f-odds","f-stake"].forEach(function(id){ $(id).addEventListener("input", update); $(id).addEventListener("change", update); });
+$("f-game").addEventListener("change", function(){ fillTeams(); prefillLine(); update(); });
+$("f-market").addEventListener("change", function(){ setLabels(); prefillLine(); update(); });
+$("f-team").addEventListener("change", function(){ prefillLine(); update(); });
+function prefillLine(){
+  var g = selGame(), m = $("f-market").value; if (!g) return;
+  if (m === "spread" && g.sp != null) { $("f-line").value = $("f-team").value === g.home ? g.sp : -g.sp; }
+  else if ((m === "over" || m === "under") && g.tot != null) { $("f-line").value = g.tot; }
+}
+var lastFmt = CL.format();
+document.addEventListener("cl-odds", function(){
+  var v = $("f-odds").value;
+  if (v !== "" && !isNaN(+v)) {
+    var am = lastFmt === "dec" ? (+v > 1 ? CL.toAm(+v) : null) : +v;
+    $("f-odds").value = am == null ? "" : showOdds(am);
+  }
+  lastFmt = CL.format(); setLabels(); update(); render();
+});
+fillTeams(); setLabels(); prefillLine(); $("f-odds").value = showOdds(-110); update(); render();
+})();
+</script>
+<footer class="cl-map"><div class="cl-in"><nav aria-label="Site map"><h2>Site map</h2><ul><li><a href="./">Home</a><span class="d">What Courtline is and how it has done</span></li><li><a href="predictions.html">Predictions</a><span class="d">Today&#x27;s games: the market number, Courtline&#x27;s projection and every graded pick this season</span></li><li><a href="research.html">Research</a><span class="d">The backtest, back to backs, home court by season and team ratings</span></li><li><a href="calculator.html">Matchup Calculator</a><span class="d">Pick any two teams, rest and a line to see Courtline&#x27;s number</span></li><li><span class="here">Bet Log (you are here)</span><span class="d">Log bets, see Courtline&#x27;s chance against the price, saved in your browser</span></li></ul></nav><nav aria-label="About Courtline"><h2>About</h2><ul><li><a href="https://github.com/stevopotpie/courtline#readme">Method and results (README)</a></li><li><a href="https://github.com/stevopotpie/courtline/blob/main/RUNBOOK.md">Runbook: data, findings, how each run works</a></li><li><a href="https://github.com/stevopotpie/courtline/blob/main/data/predictions.csv">Every projection as a CSV</a></li><li><a href="https://github.com/stevopotpie/courtline">Source code</a></li><li><a href="https://stevopotpie.github.io/gridline/">Gridline, the NFL companion model</a></li></ul></nav><div class="foot"><span>Built by Steven Sutcliffe</span><a href="https://www.linkedin.com/in/steven-sutcliffe/">LinkedIn</a><a href="https://github.com/stevopotpie">GitHub</a><span>Rebuilt Nov 10, 2:59 PM ET</span><span>Research, not betting advice. Sports betting is not legal in every state.</span></div></div></footer>
+</body>
+</html>

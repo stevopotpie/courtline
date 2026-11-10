@@ -3,297 +3,79 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta property="og:title" content="Courtline">
+<title>Courtline: an NBA model tested against the betting market</title>
+<meta name="description" content="An NBA model built on public data and tested against Vegas closing lines, run daily and graded in public. By Steven Sutcliffe.">
+<link rel="canonical" href="https://stevopotpie.github.io/courtline/">
+<meta property="og:title" content="Courtline: an NBA model tested against the betting market">
+<meta property="og:description" content="An NBA model built on public data and tested against Vegas closing lines, run daily and graded in public. By Steven Sutcliffe.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://stevopotpie.github.io/courtline/">
 <meta property="og:image" content="https://stevopotpie.github.io/courtline/og.png">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" type="image/png" href="icon.png">
 <link rel="apple-touch-icon" href="icon.png">
-<meta property="og:description" content="An NBA model built on public data and tested against Vegas closing lines. By Steven Sutcliffe.">
-<style>img{max-width:100%}</style>
-<title>Courtline</title>
-<meta name="description" content="Courtline: an NBA model built on public data and tested against Vegas closing lines. By Steven Sutcliffe.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
-<style>
-/* Layout: one narrow reading column; an arena scoreboard is the single loud element; court line drawing sits behind the hero. */
-:root {
-  --bg: #F4F6F9;
-  --surface: #FFFFFF;
-  --ink: #141A26;
-  --muted: #586174;
-  --line: #D8DDE6;
-  --court: #E4E8EF;
-  --accent: #D9541A;
-  --accent-ink: #B4420F;
-  --board: #0F141E;
-  --board-edge: #252E3F;
-  --board-ink: #EEF1F6;
-  --board-dim: #8892A6;
-  --board-digit: #FF8A3D;
-  --font-display: "Barlow Condensed", "Arial Narrow", "Roboto Condensed", sans-serif;
-  --font-body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
-  --font-mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
-}
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --bg: #0D121B; --surface: #141B27; --ink: #E7EBF2; --muted: #9AA3B6; --line: #283246; --court: #1B2434;
-    --accent: #F07A3A; --accent-ink: #F59A64; --board: #070A10; --board-edge: #222B3B;
-    color-scheme: dark;
-  }
-}
-:root[data-theme="dark"] {
-  --bg: #0D121B; --surface: #141B27; --ink: #E7EBF2; --muted: #9AA3B6; --line: #283246; --court: #1B2434;
-  --accent: #F07A3A; --accent-ink: #F59A64; --board: #070A10; --board-edge: #222B3B;
-  color-scheme: dark;
-}
-
-body {
-  margin: 0;
-  background: var(--bg);
-  color: var(--ink);
-  font-family: var(--font-body);
-  font-size: 1.0625rem;
-  line-height: 1.6;
-  padding-left: max(16px, env(safe-area-inset-left, 0px));
-  padding-right: max(16px, env(safe-area-inset-right, 0px));
-}
-.wrap { max-width: 46rem; margin: 0 auto; }
-a { color: var(--accent-ink); text-underline-offset: 3px; }
-a:focus-visible, .btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
-
-h1, h2, h3 { font-family: var(--font-display); font-weight: 700; line-height: 1.05; text-wrap: balance; margin: 0; letter-spacing: 0.005em; }
-h1 { font-size: clamp(2.6rem, 7vw, 4.4rem); text-transform: uppercase; }
-h2 { font-size: clamp(1.9rem, 4.5vw, 2.5rem); text-transform: uppercase; }
-h3 { font-size: 1.35rem; text-transform: uppercase; letter-spacing: 0.02em; }
-p { margin: 0; max-width: 65ch; }
-.eyebrow { font-family: var(--font-mono); font-size: 0.78rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent-ink); font-weight: 600; }
-.num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
-.muted { color: var(--muted); }
-
-/* Hero */
-.hero { position: relative; overflow: hidden; padding-block: 3.5rem 2.5rem; }
-.court { position: absolute; right: -140px; top: -40px; width: 520px; max-width: none; height: auto; z-index: 0; pointer-events: none; }
-.court path, .court circle, .court rect, .court line { fill: none; stroke: var(--court); stroke-width: 3; }
-.hero-inner { position: relative; z-index: 1; display: grid; gap: 1.25rem; }
-.hero h1 em { font-style: normal; color: var(--accent-ink); }
-.lede { font-size: 1.15rem; color: var(--ink); }
-.actions { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 0.5rem; }
-.btn { display: inline-flex; align-items: center; gap: 0.5rem; font-weight: 600; font-size: 0.95rem; padding: 0.7rem 1.1rem; border-radius: 6px; text-decoration: none; border: 1.5px solid var(--ink); color: var(--ink); background: transparent; }
-.btn.primary { background: var(--ink); color: var(--bg); }
-.btn:hover { border-color: var(--accent); }
-.btn.primary:hover { background: var(--accent); border-color: var(--accent); color: #fff; }
-
-/* Scoreboard */
-.board { background: var(--board); color: var(--board-ink); border: 1px solid var(--board-edge); border-radius: 10px; padding: 1.25rem 1.25rem 1rem; display: grid; gap: 0.9rem; }
-.board-head { display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--board-dim); }
-.board-grid { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; column-gap: clamp(1rem, 4vw, 2.5rem); row-gap: 0.4rem; align-items: baseline; }
-.board-grid .col { font-family: var(--font-display); font-weight: 700; font-size: 1.05rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--board-dim); text-align: right; }
-.board-grid .row-label { font-family: var(--font-display); font-weight: 600; font-size: 1.15rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--board-ink); }
-.board-grid .digit { font-family: var(--font-mono); font-weight: 600; font-variant-numeric: tabular-nums; font-size: clamp(1.7rem, 6vw, 2.6rem); color: var(--board-digit); text-align: right; line-height: 1.1; text-shadow: 0 0 18px rgba(255, 138, 61, 0.35); }
-.board-grid .rule { grid-column: 1 / -1; height: 1px; background: var(--board-edge); }
-.board-foot { font-size: 0.85rem; color: var(--board-dim); }
-
-/* Sections */
-section { padding-block: 2.75rem; border-top: 1px solid var(--line); display: grid; gap: 1.25rem; }
-.steps { list-style: none; margin: 0.5rem 0 0; padding: 0; display: grid; gap: 1.4rem; counter-reset: step; }
-.steps li { display: grid; grid-template-columns: 2.5rem minmax(0, 1fr); gap: 0.25rem 1rem; counter-increment: step; }
-.steps li::before { content: counter(step); grid-row: span 2; font-family: var(--font-display); font-weight: 700; font-size: 1.9rem; line-height: 1; color: var(--accent); }
-.steps h3 { align-self: end; }
-.steps p { color: var(--muted); }
-
-.chart { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 1rem 1rem 0.75rem; display: grid; gap: 0.5rem; }
-.chart-scroll { overflow-x: auto; }
-.chart svg { display: block; width: 100%; min-width: 560px; height: auto; }
-.chart .t-label { fill: var(--ink); font-family: var(--font-body); font-size: 14px; font-weight: 600; }
-.chart .t-sub { fill: var(--muted); font-family: var(--font-mono); font-size: 12px; }
-.chart .t-axis { fill: var(--muted); font-family: var(--font-mono); font-size: 12px; }
-.chart .t-val { fill: var(--ink); font-family: var(--font-mono); font-size: 13px; font-weight: 600; }
-.chart .t-be { fill: var(--accent-ink); font-family: var(--font-mono); font-size: 12px; font-weight: 600; }
-.chart .grid { stroke: var(--line); stroke-width: 1; fill: none; }
-.chart .track { stroke: var(--line); stroke-width: 2; fill: none; }
-.chart .coin { stroke: var(--muted); stroke-width: 1; stroke-dasharray: 3 4; fill: none; }
-.chart .be { stroke: var(--accent); stroke-width: 2; fill: none; }
-.chart .dot { fill: var(--ink); stroke: var(--surface); stroke-width: 2; }
-.caption { font-size: 0.85rem; color: var(--muted); }
-
-.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: 1rem; }
-.stat { border-left: 3px solid var(--accent); padding: 0.25rem 0 0.25rem 1rem; display: grid; gap: 0.35rem; }
-.stat .big { font-family: var(--font-mono); font-weight: 600; font-variant-numeric: tabular-nums; font-size: 2rem; line-height: 1.1; }
-.stat .what { font-weight: 600; }
-.stat .n { font-size: 0.9rem; color: var(--muted); }
-
-.ledger { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; overflow-x: auto; }
-.ledger table { width: 100%; border-collapse: collapse; min-width: 520px; font-size: 0.92rem; }
-.ledger th { text-align: left; font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); font-weight: 600; padding: 0.75rem 1rem 0.5rem; border-bottom: 1px solid var(--line); }
-.ledger td { padding: 0.65rem 1rem; border-bottom: 1px solid var(--line); font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
-.ledger tr:last-child td { border-bottom: 0; }
-.ledger td.r, .ledger th.r { text-align: right; }
-
-.chips { display: flex; flex-wrap: wrap; gap: 0.5rem; list-style: none; margin: 0; padding: 0; }
-.chips li { font-family: var(--font-mono); font-size: 0.82rem; padding: 0.3rem 0.7rem; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); }
-
-footer { border-top: 1px solid var(--line); padding-block: 2rem 3rem; display: grid; gap: 0.6rem; font-size: 0.92rem; color: var(--muted); }
-footer .links { display: flex; flex-wrap: wrap; gap: 1.25rem; }
-
-@media (max-width: 480px) {
-  .court { width: 360px; right: -150px; top: -30px; }
-  .board-grid .row-label { font-size: 1rem; }
-}
-</style>
+<link rel="stylesheet" href="courtline.css?v=b078a940">
+<script src="courtline.js?v=e6e83233"></script>
 </head>
 <body>
+<nav class="cl-nav" aria-label="Courtline pages"><div class="cl-in"><a class="cl-brand" href="./" aria-current="page"><img src="icon.png" alt="" width="26" height="26">Courtline</a><div class="cl-links"><a href="predictions.html">Predictions</a><a href="research.html">Research</a><a href="calculator.html">Calculator</a><a href="bet-log.html">Bet log</a><a class="ext" href="https://stevopotpie.github.io/gridline/">Gridline (NFL)</a><a class="ext" href="https://github.com/stevopotpie/courtline">GitHub</a></div><div class="odds-toggle" role="group" aria-label="Odds format"><button type="button" data-fmt="am" aria-pressed="true">&minus;110</button><button type="button" data-fmt="dec" aria-pressed="false">1.91x</button></div></div></nav>
+<style>
+.steps{list-style:none;margin:.25rem 0 0;padding:0;display:grid;gap:1.3rem;counter-reset:step}
+.steps li{display:grid;grid-template-columns:2.5rem minmax(0,1fr);gap:.2rem 1rem;counter-increment:step}
+.steps li::before{content:counter(step);grid-row:span 2;font:700 1.9rem/1 var(--font-display);color:var(--accent)}
+.steps h3{align-self:end}.steps p{color:var(--muted)}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(14rem,1fr));gap:.9rem}
+.card{display:grid;gap:.4rem;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:1rem 1.1rem;color:var(--ink);text-decoration:none}
+.card:hover{border-color:var(--accent)}.card h3{color:var(--accent-ink)}.card p{color:var(--muted);font-size:.95rem}
+</style>
+<main class="wrap">
+<header class="page-head" style="padding-top:3rem">
+  <span class="eyebrow">Courtline · NBA model vs. the betting market</span>
+  <h1>Vegas missed by <span style="color:var(--accent-ink)">10.55</span>. My model missed by <span style="color:var(--accent-ink)">10.56</span>.</h1>
+  <p class="lede">I built an NBA model from public data and tested it on 6,573 games it had never seen. It found no edge against the closing line on sides or totals. Now it runs every day of the 2026–27 season, projects every game against the market, and grades itself in public.</p>
+  <div class="actions"><a class="btn primary" href="predictions.html">Today's projections</a><a class="btn" href="research.html">Read the research</a></div>
+</header>
 
-<div class="wrap">
-  <header class="hero">
-    <svg class="court" viewBox="0 0 500 470" aria-hidden="true">
-      <rect x="10" y="10" width="480" height="450"></rect>
-      <rect x="170" y="10" width="160" height="190"></rect>
-      <circle cx="250" cy="200" r="60"></circle>
-      <path d="M40 10 V140 A220 220 0 0 0 460 140 V10"></path>
-      <circle cx="250" cy="52" r="8"></circle>
-      <line x1="220" y1="40" x2="280" y2="40"></line>
-      <path d="M190 460 A60 60 0 0 1 310 460"></path>
-    </svg>
-    <div class="hero-inner">
-      <span class="eyebrow">Courtline · NBA model vs. the betting market</span>
-      <h1>Vegas missed by <em>10.55</em>. My model missed by <em>10.56</em>.</h1>
-      <p class="lede">I built an NBA model from public data and tested it on 6,573 games it had never seen. It found no edge against the closing line on sides or totals. This page covers how it was built, what the test showed, and where an edge is still plausible.</p>
-      <div class="actions">
-        <a class="btn primary" href="https://github.com/stevopotpie/courtline" target="_blank" rel="noopener">View the code on GitHub</a>
-        <a class="btn" href="https://stevopotpie.github.io/gridline/">See Gridline, the NFL model</a>
-      </div>
-    </div>
-  </header>
+<div class="board" role="table" aria-label="6,573 games · 2021–26"><div class="board-head"><span>Backtest v0 · walk forward</span><span>6,573 games · 2021–26</span></div><div class="board-grid" role="rowgroup"><span role="columnheader"></span><span class="col" role="columnheader">Vegas</span><span class="col" role="columnheader">Courtline</span><span class="rule" aria-hidden="true"></span><span class="row-label" role="rowheader">Avg miss, margin</span><span class="digit" role="cell">10.55</span><span class="digit" role="cell">10.56</span><span class="row-label" role="rowheader">Avg miss, total</span><span class="digit" role="cell">14.22</span><span class="digit" role="cell">14.22</span></div><p class="board-foot">Average points between the projection and the final score, on games each season's model had never seen.</p></div>
 
-  <div class="board" role="table" aria-label="Average miss against final scores, 2021–22 to 2025–26">
-    <div class="board-head"><span>Backtest v0 · walk forward</span><span>6,573 games · 2021–22 to 2025–26</span></div>
-    <div class="board-grid" role="rowgroup">
-      <span role="columnheader"></span><span class="col" role="columnheader">Vegas</span><span class="col" role="columnheader">Model</span>
-      <span class="rule" aria-hidden="true"></span>
-      <span class="row-label" role="rowheader">Avg miss, margin</span><span class="digit" role="cell">10.55</span><span class="digit" role="cell">10.56</span>
-      <span class="row-label" role="rowheader">Avg miss, total</span><span class="digit" role="cell">14.22</span><span class="digit" role="cell">14.22</span>
-    </div>
-    <p class="board-foot">Average points between the projection and the final score. The closing line and the model landed in the same place.</p>
+<section class="block" aria-labelledby="season-h">
+  <span class="eyebrow">This season, out of sample</span>
+  <h2 id="season-h">2026–27: 97 games graded</h2>
+  <p>Every game is projected against the consensus line from my last odds pull before tip, using a model trained only on earlier seasons. Courtline always takes a side, so these records include every graded game, not a hand-picked list.</p>
+  <div class="stats">
+    <div class="stat"><span class="big">44–51–2</span><span class="what">Against the spread</span><span class="n">46.3% · every game</span></div>
+    <div class="stat"><span class="big">41–55–1</span><span class="what">Totals, over or under</span><span class="n">42.7% · every game</span></div>
+    <div class="stat"><span class="big">12.01</span><span class="what">Avg miss on the margin</span><span class="n">Vegas: 12.01</span></div>
   </div>
+  <p><a href="predictions.html#graded">See every graded game</a></p>
+</section>
 
-  <section aria-labelledby="how">
-    <span class="eyebrow">How it works</span>
-    <h2 id="how">Five steps, built in order</h2>
-    <p>Courtline follows the same rule as <a href="https://stevopotpie.github.io/gridline/">Gridline</a>: build projections from public data, test them only on games the model has not seen, and trust only what holds up against the closing line.</p>
-    <ol class="steps">
-      <li><h3>Collect the data</h3><p>Team and player box scores, schedules, and consensus closing spreads and totals for about 7,900 games from July 2020 to June 2026, from the open hoopR NBA dataset.</p></li>
-      <li><h3>Model team form</h3><p>Exponentially weighted offensive rating, defensive rating and pace with a 12 game half life, regressed 30% toward average between seasons, plus rest days and back to backs.</p></li>
-      <li><h3>Backtest walk forward</h3><p>Each season from 2021–22 to 2025–26 is projected only from the games before it, then scored against final results and the closing line.</p></li>
-      <li><h3>Save the market</h3><p>A scheduled daily pull from The Odds API saves spreads, totals and moneylines across US sportsbooks as timestamped snapshots, so every projection can be graded on closing line value. It runs on about 90 credits a month, inside the free tier.</p></li>
-      <li><h3>Paper trade first</h3><p>Every projection is logged with its line, lean and edge, then graded against results and the close for four to six weeks before any real money.</p></li>
-    </ol>
-  </section>
+<section class="block" aria-labelledby="how-h">
+  <span class="eyebrow">How it works</span>
+  <h2 id="how-h">Five steps, run every day</h2>
+  <ol class="steps">
+    <li><h3>Collect the data</h3><p>Team box scores, schedules and closing lines from the open hoopR NBA dataset: about 7,899 lined games since 2020, plus every game this season.</p></li>
+    <li><h3>Model team form</h3><p>Exponentially weighted offensive rating, defensive rating and pace with a 12 game half life, regressed 30% toward average between seasons, plus rest days and back to backs.</p></li>
+    <li><h3>Backtest walk forward</h3><p>Each season from 2021–26 is projected only from the games before it, then scored against final results and the closing line.</p></li>
+    <li><h3>Save the market</h3><p>A daily pull from The Odds API saves spreads, totals and moneylines across US sportsbooks before the evening slate, so every projection is graded against a real number.</p></li>
+    <li><h3>Publish and grade</h3><p>This site rebuilds itself every evening after the odds pull and every morning after the results, so each projection is posted before tip and graded after the final.</p></li>
+  </ol>
+</section>
 
-  <section aria-labelledby="found">
-    <span class="eyebrow">What the backtest found</span>
-    <h2 id="found">The market already knew</h2>
-    <p>The model agreed with the closing line so closely that it almost never moved a spread by a full point. On the games where it did lean one way, no group cleared the 52.4% win rate needed to profit at standard &minus;110 pricing.</p>
-    <figure class="chart" style="margin:0">
-      <div class="chart-scroll">
-        <svg viewBox="0 0 640 262" role="img" aria-labelledby="chart-title chart-desc">
-          <title id="chart-title">Win rate by lean size against the closing line</title>
-          <desc id="chart-desc">Spread leans of half a point or more won 50.8% of 496 bets. Total leans of 1 point or more won 51.8% of 1,666; 1.5 or more won 49.7% of 717; 2 or more won 48.6% of 249. Breakeven is 52.4%.</desc>
-          <line class="grid" x1="160" y1="24" x2="160" y2="216"></line>
-          <line class="grid" x1="270" y1="24" x2="270" y2="216"></line>
-          <line class="grid" x1="490" y1="24" x2="490" y2="216"></line>
-          <line class="grid" x1="600" y1="24" x2="600" y2="216"></line>
-          <line class="coin" x1="380" y1="24" x2="380" y2="216"></line>
-          <line class="be" x1="511" y1="20" x2="511" y2="216"></line>
-          <text class="t-be" x="507" y="14" text-anchor="end">Breakeven 52.4%</text>
-
-          <text class="t-label" x="0" y="52">Spread, lean 0.5+</text>
-          <text class="t-sub" x="0" y="68">496 bets</text>
-          <line class="track" x1="160" y1="56" x2="600" y2="56"></line>
-          <circle class="dot" cx="424" cy="56" r="7"></circle>
-          <text class="t-val" x="436" y="51">50.8%</text>
-
-          <text class="t-label" x="0" y="96">Total, lean 1+</text>
-          <text class="t-sub" x="0" y="112">1,666 bets</text>
-          <line class="track" x1="160" y1="100" x2="600" y2="100"></line>
-          <circle class="dot" cx="479" cy="100" r="7"></circle>
-          <text class="t-val" x="467" y="95" text-anchor="end">51.8%</text>
-
-          <text class="t-label" x="0" y="140">Total, lean 1.5+</text>
-          <text class="t-sub" x="0" y="156">717 bets</text>
-          <line class="track" x1="160" y1="144" x2="600" y2="144"></line>
-          <circle class="dot" cx="363.5" cy="144" r="7"></circle>
-          <text class="t-val" x="376" y="139">49.7%</text>
-
-          <text class="t-label" x="0" y="184">Total, lean 2+</text>
-          <text class="t-sub" x="0" y="200">249 bets</text>
-          <line class="track" x1="160" y1="188" x2="600" y2="188"></line>
-          <circle class="dot" cx="303" cy="188" r="7"></circle>
-          <text class="t-val" x="315" y="183">48.6%</text>
-
-          <line class="grid" x1="160" y1="216" x2="600" y2="216"></line>
-          <text class="t-axis" x="160" y="238" text-anchor="middle">46%</text>
-          <text class="t-axis" x="270" y="238" text-anchor="middle">48%</text>
-          <text class="t-axis" x="380" y="238" text-anchor="middle">50%</text>
-          <text class="t-axis" x="490" y="238" text-anchor="middle">52%</text>
-          <text class="t-axis" x="600" y="238" text-anchor="middle">54%</text>
-          <text class="t-axis" x="380" y="258" text-anchor="middle">Win rate against the closing line (dashed line = coin flip)</text>
-        </svg>
-      </div>
-      <figcaption class="caption">Lean size is how far the model's projection sat from the closing number, in points.</figcaption>
-    </figure>
-    <p>That is the expected answer. NBA closing lines are some of the most efficient prices in sports, and team form is already built into them. A backtest that reports this plainly is doing its job.</p>
-  </section>
-
-  <section aria-labelledby="thread">
-    <span class="eyebrow">One thread to pull</span>
-    <h2 id="thread">Tired road teams and the total</h2>
-    <p>One pattern stood out from the noise. When the road team was playing its second game in two nights, games finished over the closing total by more than a point on average. At about 2.3 standard errors it is suggestive and unproven, so it gets retested on new games before it counts for anything.</p>
-    <div class="stats">
-      <div class="stat"><span class="big">+1.23</span><span class="what">points over the closing total</span><span class="n">Road team on a back to back · 1,158 games</span></div>
-      <div class="stat"><span class="big">&minus;0.65</span><span class="what">points against the spread</span><span class="n">Home team on a back to back · 978 games</span></div>
-    </div>
-  </section>
-
-  <section aria-labelledby="next">
-    <span class="eyebrow">What comes next</span>
-    <h2 id="next">Player minutes and props</h2>
-    <p>If a model like this has an NBA edge anywhere, props are the likeliest place: thinner markets, many more lines, and slower adjustments to minutes and role changes. The plan is a player minutes model first, then props, then totals, with sides last if ever.</p>
-    <p>The obstacle is data. No public source has historical player prop lines, so Courtline will save its own prop odds going forward and grade early projections against results until enough market history builds up.</p>
-    <h3 style="margin-top:0.75rem">Opening night, logged</h3>
-    <p class="muted">The first two paper entries, October 20, 2026. Both carry a stated blind spot: v0 knew nothing about offseason roster moves.</p>
-    <div class="ledger">
-      <table>
-        <thead><tr><th>Game</th><th>Market</th><th>Line</th><th>Model</th><th>Lean</th><th class="r">Edge</th></tr></thead>
-        <tbody>
-          <tr><td>PHI at NY</td><td>Spread</td><td>NY &minus;4.5</td><td>NY by 5.0</td><td>NY &minus;4.5</td><td class="r">0.5</td></tr>
-          <tr><td>PHI at NY</td><td>Total</td><td>231.5</td><td>226.3</td><td>Under</td><td class="r">5.2</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </section>
-
-  <section aria-labelledby="stack">
-    <span class="eyebrow">Built with</span>
-    <h2 id="stack" style="font-size:1.6rem">Tools</h2>
-    <ul class="chips">
-      <li>Python</li><li>Parquet</li><li>hoopR NBA data</li><li>The Odds API</li><li>Scheduled daily jobs</li><li>Git and GitHub</li>
-    </ul>
-  </section>
-
-  <footer>
-    <p>Built by <strong style="color:var(--ink)">Steven Sutcliffe</strong>, data analyst, Atlanta Metro, GA.</p>
-    <div class="links">
-      <a href="https://github.com/stevopotpie/courtline" target="_blank" rel="noopener">Courtline on GitHub</a>
-      <a href="https://stevopotpie.github.io/gridline/">Gridline, the NFL model</a>
-      <a href="https://github.com/stevopotpie" target="_blank" rel="noopener">All projects</a>
-      <a href="https://www.linkedin.com/in/steven-sutcliffe/" target="_blank" rel="noopener">LinkedIn</a>
-    </div>
-    <p>Research, not betting advice. Sports betting is not legal in every state.</p>
-  </footer>
-</div>
-
+<section class="block" aria-labelledby="explore-h">
+  <span class="eyebrow">Explore</span>
+  <h2 id="explore-h">Four ways in</h2>
+  <div class="cards">
+    <a class="card" href="predictions.html"><h3>Predictions</h3><p>20 upcoming games with the market number, Courtline's projection and the lean.</p></a>
+    <a class="card" href="research.html"><h3>Research</h3><p>The backtest, the back to back finding, home court by season and today's team ratings.</p></a>
+    <a class="card" href="calculator.html"><h3>Calculator</h3><p>Any two teams, any rest, any line. See the projected margin, total and fair price.</p></a>
+    <a class="card" href="bet-log.html"><h3>Bet log</h3><p>Log a bet and see Courtline's chance against the price. Saved in your browser only.</p></a>
+  </div>
+</section>
+</main>
+<footer class="cl-map"><div class="cl-in"><nav aria-label="Site map"><h2>Site map</h2><ul><li><span class="here">Home (you are here)</span><span class="d">What Courtline is and how it has done</span></li><li><a href="predictions.html">Predictions</a><span class="d">Today&#x27;s games: the market number, Courtline&#x27;s projection and every graded pick this season</span></li><li><a href="research.html">Research</a><span class="d">The backtest, back to backs, home court by season and team ratings</span></li><li><a href="calculator.html">Matchup Calculator</a><span class="d">Pick any two teams, rest and a line to see Courtline&#x27;s number</span></li><li><a href="bet-log.html">Bet Log</a><span class="d">Log bets, see Courtline&#x27;s chance against the price, saved in your browser</span></li></ul></nav><nav aria-label="About Courtline"><h2>About</h2><ul><li><a href="https://github.com/stevopotpie/courtline#readme">Method and results (README)</a></li><li><a href="https://github.com/stevopotpie/courtline/blob/main/RUNBOOK.md">Runbook: data, findings, how each run works</a></li><li><a href="https://github.com/stevopotpie/courtline/blob/main/data/predictions.csv">Every projection as a CSV</a></li><li><a href="https://github.com/stevopotpie/courtline">Source code</a></li><li><a href="https://stevopotpie.github.io/gridline/">Gridline, the NFL companion model</a></li></ul></nav><div class="foot"><span>Built by Steven Sutcliffe</span><a href="https://www.linkedin.com/in/steven-sutcliffe/">LinkedIn</a><a href="https://github.com/stevopotpie">GitHub</a><span>Rebuilt Nov 10, 2:59 PM ET</span><span>Research, not betting advice. Sports betting is not legal in every state.</span></div></div></footer>
 </body>
 </html>
