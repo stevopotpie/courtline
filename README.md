@@ -17,6 +17,7 @@ Courtline is the NBA companion to [Gridline](https://github.com/stevopotpie/grid
 [stevopotpie.github.io/courtline](https://stevopotpie.github.io/courtline/) rebuilds itself twice a day on GitHub Actions: after the evening odds pull, and at midday once last night's box scores land.
 
 - **[Predictions](https://stevopotpie.github.io/courtline/predictions.html)**: the next three days of games with the market's consensus line, Courtline's projection and side, plus every graded game this season
+- **[In-game](https://stevopotpie.github.io/courtline/in-game.html)**: live scores from ESPN every 30 seconds, Courtline's live win chance for each team, and a check for any live moneyline you type in
 - **[Research](https://stevopotpie.github.io/courtline/research.html)**: the backtest against the close, back to backs, home court by season and current team ratings
 - **[Calculator](https://stevopotpie.github.io/courtline/calculator.html)**: any two teams, any rest, any line
 - **[Bet log](https://stevopotpie.github.io/courtline/bet-log.html)**: log bets and see Courtline's chance against the price, saved in your own browser only
@@ -26,7 +27,8 @@ Every 2026-27 projection is out of sample: the live model is trained only on ear
 ## Files
 
 - `model.py`: team form ratings, the walk forward backtest, live projections and the graded season log (`python3 -I model.py HOOPR_DIR .`)
-- `site/build.py`, `site/courtline.css`, `site/courtline.js`: build the pages in `docs/` from `data/courtline.json`
+- `live_train.py`: trains the in-game win model on hoopR play by play (2020 to 2026) and saves `data/live_model.json`; rerun after each season
+- `site/build.py`, `site/ingame.py`, `site/courtline.css`, `site/courtline.js`: build the pages in `docs/` from `data/courtline.json`
 - `run_site.sh`: fetch hoopR data, run the model, build the site (what the workflows run)
 - `data/predictions.csv`: every projection this season, with the line, Courtline's number and the final
 - `backtest_v0.py`: the original team form backtest (`python3 -I backtest_v0.py PATH_TO_hoopR-nba-data`)

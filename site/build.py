@@ -28,6 +28,7 @@ for f in ("courtline.css", "courtline.js"):
 PAGES = [  # file, nav label, site map name, description
     ("index.html", None, "Home", "What Courtline is and how it has done"),
     ("predictions.html", "Predictions", "Predictions", "Today's games: the market number, Courtline's projection and every graded pick this season"),
+    ("in-game.html", "In-game", "In-game", "Live scores, Courtline's live win chance, and a check for any live moneyline"),
     ("research.html", "Research", "Research", "The backtest, back to backs, home court by season and team ratings"),
     ("calculator.html", "Calculator", "Matchup Calculator", "Pick any two teams, rest and a line to see Courtline's number"),
     ("bet-log.html", "Bet log", "Bet Log", "Log bets, see Courtline's chance against the price, saved in your browser"),
@@ -832,5 +833,7 @@ fillTeams(); setLabels(); prefillLine(); $("f-odds").value = showOdds(-110); upd
 page("bet-log.html", "Courtline Bet Log",
      "Log NBA bets and see Courtline's chance against the price. Bets are saved in your browser only, with export and import.",
      bet_css + bet_body, bet_js)
+
+exec(open(os.path.join(SITE, "ingame.py"), encoding="utf-8").read())
 
 print("built", ", ".join(f for f, *_ in PAGES), "| upcoming", len(upcoming), "| graded", S["graded"])

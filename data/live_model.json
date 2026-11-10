@@ -1,0 +1,105 @@
+{
+ "built_utc": "2026-11-10T20:36:33.469879+00:00",
+ "a": 0.08404,
+ "b": 0.13763,
+ "d": 0.002,
+ "games": 7898,
+ "states": 2885589,
+ "seasons": "2019\u201326",
+ "test": {
+  "season": "2025\u201326",
+  "games": 1315,
+  "states": 489609,
+  "brier": 0.1436,
+  "brier_tip": 0.1971,
+  "calibration": [
+   {
+    "bin": "0\u201310%",
+    "states": 62592,
+    "predicted": 0.036,
+    "actual": 0.026
+   },
+   {
+    "bin": "10\u201320%",
+    "states": 37848,
+    "predicted": 0.15,
+    "actual": 0.17
+   },
+   {
+    "bin": "20\u201330%",
+    "states": 37800,
+    "predicted": 0.25,
+    "actual": 0.264
+   },
+   {
+    "bin": "30\u201340%",
+    "states": 37295,
+    "predicted": 0.35,
+    "actual": 0.381
+   },
+   {
+    "bin": "40\u201350%",
+    "states": 35751,
+    "predicted": 0.45,
+    "actual": 0.482
+   },
+   {
+    "bin": "50\u201360%",
+    "states": 37882,
+    "predicted": 0.55,
+    "actual": 0.555
+   },
+   {
+    "bin": "60\u201370%",
+    "states": 42586,
+    "predicted": 0.651,
+    "actual": 0.647
+   },
+   {
+    "bin": "70\u201380%",
+    "states": 49862,
+    "predicted": 0.751,
+    "actual": 0.736
+   },
+   {
+    "bin": "80\u201390%",
+    "states": 56342,
+    "predicted": 0.851,
+    "actual": 0.837
+   },
+   {
+    "bin": "90\u2013100%",
+    "states": 91651,
+    "predicted": 0.964,
+    "actual": 0.978
+   }
+  ],
+  "by_quarter": [
+   {
+    "quarter": "1st quarter",
+    "states": 121046,
+    "brier": 0.1908,
+    "accuracy": 0.707
+   },
+   {
+    "quarter": "2nd quarter",
+    "states": 122846,
+    "brier": 0.1686,
+    "accuracy": 0.742
+   },
+   {
+    "quarter": "3rd quarter",
+    "states": 122083,
+    "brier": 0.1355,
+    "accuracy": 0.799
+   },
+   {
+    "quarter": "4th quarter",
+    "states": 120782,
+    "brier": 0.0787,
+    "accuracy": 0.888
+   }
+  ]
+ },
+ "formula": "P(home wins) = 1 / (1 + exp(-(a * margin / sqrt(tau + d) + b * expected_margin * sqrt(tau + d)))), tau = seconds left / 2880"
+}
