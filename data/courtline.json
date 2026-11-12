@@ -1,7 +1,7 @@
 {
- "built_utc": "2026-11-12T03:24:20.588556+00:00",
+ "built_utc": "2026-11-12T22:43:54.970531+00:00",
  "season_label": "2026\u201327",
- "data_through": "2026-11-10",
+ "data_through": "2026-11-11",
  "latest_pull": "2026-11-12T03:24:06.359397+00:00",
  "snapshots": 18,
  "thresholds": {
@@ -175,10 +175,10 @@
   "lined_games": 7899
  },
  "season": {
-  "graded": 102,
+  "graded": 107,
   "spread_all": {
-   "w": 47,
-   "l": 53,
+   "w": 49,
+   "l": 56,
    "p": 2
   },
   "spread_leans": {
@@ -187,8 +187,8 @@
    "p": 0
   },
   "total_all": {
-   "w": 43,
-   "l": 57,
+   "w": 45,
+   "l": 60,
    "p": 2
   },
   "total_leans": {
@@ -196,59 +196,59 @@
    "l": 5,
    "p": 0
   },
-  "vegas_miss_margin": 12.04,
-  "model_miss_margin": 12.05,
-  "vegas_miss_total": 13.73,
-  "model_miss_total": 13.89
+  "vegas_miss_margin": 12.03,
+  "model_miss_margin": 12.03,
+  "vegas_miss_total": 13.6,
+  "model_miss_total": 13.74
  },
  "ratings": [
   {
-   "team": "NY",
-   "name": "New York Knicks",
-   "ortg": 115.4,
-   "drtg": 106.2,
-   "net": 9.2,
-   "pace": 97.5,
-   "games": 10,
-   "wins": 6,
-   "losses": 4,
-   "last_game": "2026-11-10"
-  },
-  {
    "team": "SA",
    "name": "San Antonio Spurs",
-   "ortg": 115.2,
-   "drtg": 106.5,
-   "net": 8.7,
-   "pace": 100.7,
-   "games": 11,
-   "wins": 9,
+   "ortg": 115.8,
+   "drtg": 107.3,
+   "net": 8.5,
+   "pace": 100.6,
+   "games": 12,
+   "wins": 10,
    "losses": 2,
-   "last_game": "2026-11-09"
+   "last_game": "2026-11-11"
   },
   {
    "team": "BOS",
    "name": "Boston Celtics",
-   "ortg": 116.4,
-   "drtg": 107.8,
-   "net": 8.6,
-   "pace": 97.6,
-   "games": 11,
-   "wins": 9,
+   "ortg": 115.7,
+   "drtg": 107.3,
+   "net": 8.4,
+   "pace": 97.4,
+   "games": 12,
+   "wins": 10,
    "losses": 2,
-   "last_game": "2026-11-10"
+   "last_game": "2026-11-11"
+  },
+  {
+   "team": "NY",
+   "name": "New York Knicks",
+   "ortg": 115.4,
+   "drtg": 107.2,
+   "net": 8.2,
+   "pace": 97.2,
+   "games": 11,
+   "wins": 6,
+   "losses": 5,
+   "last_game": "2026-11-11"
   },
   {
    "team": "HOU",
    "name": "Houston Rockets",
-   "ortg": 114.4,
-   "drtg": 108.9,
-   "net": 5.5,
-   "pace": 98.5,
-   "games": 11,
-   "wins": 8,
+   "ortg": 114.6,
+   "drtg": 109.0,
+   "net": 5.6,
+   "pace": 98.4,
+   "games": 12,
+   "wins": 9,
    "losses": 3,
-   "last_game": "2026-11-09"
+   "last_game": "2026-11-11"
   },
   {
    "team": "DET",
@@ -265,14 +265,26 @@
   {
    "team": "OKC",
    "name": "Oklahoma City Thunder",
-   "ortg": 112.8,
-   "drtg": 107.8,
-   "net": 5.0,
+   "ortg": 112.5,
+   "drtg": 108.4,
+   "net": 4.1,
    "pace": 100.3,
-   "games": 11,
+   "games": 12,
    "wins": 8,
-   "losses": 3,
-   "last_game": "2026-11-10"
+   "losses": 4,
+   "last_game": "2026-11-11"
+  },
+  {
+   "team": "LAL",
+   "name": "Los Angeles Lakers",
+   "ortg": 116.3,
+   "drtg": 112.3,
+   "net": 4.0,
+   "pace": 100.1,
+   "games": 13,
+   "wins": 11,
+   "losses": 2,
+   "last_game": "2026-11-11"
   },
   {
    "team": "MIN",
@@ -289,62 +301,50 @@
   {
    "team": "GS",
    "name": "Golden State Warriors",
-   "ortg": 115.7,
-   "drtg": 111.8,
-   "net": 3.8,
-   "pace": 100.9,
-   "games": 11,
-   "wins": 8,
-   "losses": 3,
-   "last_game": "2026-11-09"
-  },
-  {
-   "team": "LAL",
-   "name": "Los Angeles Lakers",
-   "ortg": 115.9,
-   "drtg": 112.4,
-   "net": 3.6,
-   "pace": 100.1,
+   "ortg": 115.4,
+   "drtg": 112.2,
+   "net": 3.2,
+   "pace": 100.7,
    "games": 12,
-   "wins": 10,
-   "losses": 2,
-   "last_game": "2026-11-09"
+   "wins": 8,
+   "losses": 4,
+   "last_game": "2026-11-11"
   },
   {
    "team": "POR",
    "name": "Portland Trail Blazers",
-   "ortg": 113.6,
-   "drtg": 110.8,
-   "net": 2.8,
+   "ortg": 113.8,
+   "drtg": 110.6,
+   "net": 3.2,
    "pace": 101.1,
-   "games": 10,
-   "wins": 7,
+   "games": 11,
+   "wins": 8,
    "losses": 3,
-   "last_game": "2026-11-10"
+   "last_game": "2026-11-11"
   },
   {
    "team": "DEN",
    "name": "Denver Nuggets",
-   "ortg": 115.2,
-   "drtg": 113.4,
-   "net": 1.8,
-   "pace": 100.3,
-   "games": 9,
-   "wins": 5,
+   "ortg": 115.9,
+   "drtg": 113.8,
+   "net": 2.0,
+   "pace": 100.2,
+   "games": 10,
+   "wins": 6,
    "losses": 4,
-   "last_game": "2026-11-09"
+   "last_game": "2026-11-11"
   },
   {
    "team": "TOR",
    "name": "Toronto Raptors",
-   "ortg": 113.5,
-   "drtg": 111.9,
-   "net": 1.6,
-   "pace": 100.9,
-   "games": 10,
+   "ortg": 112.6,
+   "drtg": 111.5,
+   "net": 1.2,
+   "pace": 100.5,
+   "games": 11,
    "wins": 5,
-   "losses": 5,
-   "last_game": "2026-11-09"
+   "losses": 6,
+   "last_game": "2026-11-11"
   },
   {
    "team": "ATL",
@@ -359,6 +359,18 @@
    "last_game": "2026-11-09"
   },
   {
+   "team": "CLE",
+   "name": "Cleveland Cavaliers",
+   "ortg": 113.4,
+   "drtg": 113.2,
+   "net": 0.2,
+   "pace": 100.2,
+   "games": 12,
+   "wins": 6,
+   "losses": 6,
+   "last_game": "2026-11-11"
+  },
+  {
    "team": "DAL",
    "name": "Dallas Mavericks",
    "ortg": 112.4,
@@ -368,18 +380,6 @@
    "games": 11,
    "wins": 7,
    "losses": 4,
-   "last_game": "2026-11-09"
-  },
-  {
-   "team": "CLE",
-   "name": "Cleveland Cavaliers",
-   "ortg": 112.8,
-   "drtg": 113.1,
-   "net": -0.3,
-   "pace": 100.6,
-   "games": 11,
-   "wins": 5,
-   "losses": 6,
    "last_game": "2026-11-09"
   },
   {
@@ -400,7 +400,7 @@
    "ortg": 112.6,
    "drtg": 114.3,
    "net": -1.7,
-   "pace": 100.9,
+   "pace": 100.8,
    "games": 10,
    "wins": 2,
    "losses": 8,
@@ -431,21 +431,21 @@
    "last_game": "2026-11-09"
   },
   {
-   "team": "MEM",
-   "name": "Memphis Grizzlies",
-   "ortg": 111.8,
-   "drtg": 114.5,
-   "net": -2.7,
-   "pace": 102.6,
-   "games": 10,
-   "wins": 7,
-   "losses": 3,
-   "last_game": "2026-11-09"
+   "team": "ORL",
+   "name": "Orlando Magic",
+   "ortg": 108.8,
+   "drtg": 111.5,
+   "net": -2.6,
+   "pace": 100.8,
+   "games": 11,
+   "wins": 4,
+   "losses": 7,
+   "last_game": "2026-11-11"
   },
   {
    "team": "PHX",
    "name": "Phoenix Suns",
-   "ortg": 112.1,
+   "ortg": 112.2,
    "drtg": 115.1,
    "net": -2.9,
    "pace": 99.6,
@@ -455,64 +455,64 @@
    "last_game": "2026-11-10"
   },
   {
-   "team": "ORL",
-   "name": "Orlando Magic",
-   "ortg": 108.0,
-   "drtg": 111.6,
-   "net": -3.7,
-   "pace": 100.9,
-   "games": 10,
-   "wins": 3,
-   "losses": 7,
-   "last_game": "2026-11-10"
+   "team": "MEM",
+   "name": "Memphis Grizzlies",
+   "ortg": 112.3,
+   "drtg": 115.2,
+   "net": -2.9,
+   "pace": 102.3,
+   "games": 11,
+   "wins": 7,
+   "losses": 4,
+   "last_game": "2026-11-11"
   },
   {
    "team": "IND",
    "name": "Indiana Pacers",
-   "ortg": 110.0,
-   "drtg": 114.5,
-   "net": -4.5,
-   "pace": 102.0,
-   "games": 11,
-   "wins": 3,
+   "ortg": 110.4,
+   "drtg": 113.9,
+   "net": -3.5,
+   "pace": 101.8,
+   "games": 12,
+   "wins": 4,
    "losses": 8,
-   "last_game": "2026-11-09"
+   "last_game": "2026-11-11"
   },
   {
    "team": "NO",
    "name": "New Orleans Pelicans",
    "ortg": 111.6,
-   "drtg": 116.2,
-   "net": -4.5,
-   "pace": 103.5,
-   "games": 11,
+   "drtg": 117.8,
+   "net": -6.2,
+   "pace": 103.3,
+   "games": 12,
    "wins": 4,
-   "losses": 7,
-   "last_game": "2026-11-09"
+   "losses": 8,
+   "last_game": "2026-11-11"
+  },
+  {
+   "team": "BKN",
+   "name": "Brooklyn Nets",
+   "ortg": 107.7,
+   "drtg": 114.7,
+   "net": -7.0,
+   "pace": 100.5,
+   "games": 11,
+   "wins": 3,
+   "losses": 8,
+   "last_game": "2026-11-11"
   },
   {
    "team": "WSH",
    "name": "Washington Wizards",
-   "ortg": 108.1,
-   "drtg": 116.2,
-   "net": -8.1,
-   "pace": 101.9,
-   "games": 11,
+   "ortg": 107.8,
+   "drtg": 116.3,
+   "net": -8.4,
+   "pace": 101.7,
+   "games": 12,
    "wins": 4,
-   "losses": 7,
-   "last_game": "2026-11-09"
-  },
-  {
-   "team": "UTAH",
-   "name": "Utah Jazz",
-   "ortg": 106.8,
-   "drtg": 115.4,
-   "net": -8.6,
-   "pace": 103.9,
-   "games": 11,
-   "wins": 1,
-   "losses": 10,
-   "last_game": "2026-11-10"
+   "losses": 8,
+   "last_game": "2026-11-11"
   },
   {
    "team": "SAC",
@@ -527,40 +527,40 @@
    "last_game": "2026-11-10"
   },
   {
-   "team": "CHI",
-   "name": "Chicago Bulls",
-   "ortg": 108.5,
-   "drtg": 117.9,
-   "net": -9.4,
-   "pace": 105.0,
-   "games": 9,
+   "team": "UTAH",
+   "name": "Utah Jazz",
+   "ortg": 106.9,
+   "drtg": 115.9,
+   "net": -9.0,
+   "pace": 103.7,
+   "games": 12,
    "wins": 1,
-   "losses": 8,
-   "last_game": "2026-11-08"
+   "losses": 11,
+   "last_game": "2026-11-11"
   },
   {
-   "team": "BKN",
-   "name": "Brooklyn Nets",
-   "ortg": 105.5,
-   "drtg": 114.9,
-   "net": -9.4,
-   "pace": 100.5,
+   "team": "CHI",
+   "name": "Chicago Bulls",
+   "ortg": 109.2,
+   "drtg": 118.4,
+   "net": -9.2,
+   "pace": 104.7,
    "games": 10,
-   "wins": 2,
-   "losses": 8,
-   "last_game": "2026-11-08"
+   "wins": 1,
+   "losses": 9,
+   "last_game": "2026-11-11"
   },
   {
    "team": "MIL",
    "name": "Milwaukee Bucks",
-   "ortg": 107.9,
-   "drtg": 119.1,
+   "ortg": 108.1,
+   "drtg": 119.3,
    "net": -11.2,
-   "pace": 99.4,
-   "games": 11,
+   "pace": 99.5,
+   "games": 12,
    "wins": 1,
-   "losses": 10,
-   "last_game": "2026-11-10"
+   "losses": 11,
+   "last_game": "2026-11-11"
   }
  ],
  "games": [
@@ -6160,9 +6160,9 @@
    "away": "WSH",
    "home_name": "Indiana Pacers",
    "away_name": "Washington Wizards",
-   "final": false,
-   "home_score": null,
-   "away_score": null,
+   "final": true,
+   "home_score": 114,
+   "away_score": 101,
    "home_rest": 2,
    "away_rest": 2,
    "home_b2b": false,
@@ -6182,7 +6182,15 @@
    "proj_total": 227.2,
    "total_edge": 0.4,
    "total_pick": "over",
-   "over_chance": 0.509
+   "over_chance": 0.509,
+   "spread_grade": {
+    "result": "loss",
+    "lean": false
+   },
+   "total_grade": {
+    "result": "loss",
+    "lean": false
+   }
   },
   {
    "game_id": 401909967,
@@ -6192,9 +6200,9 @@
    "away": "CLE",
    "home_name": "New York Knicks",
    "away_name": "Cleveland Cavaliers",
-   "final": false,
-   "home_score": null,
-   "away_score": null,
+   "final": true,
+   "home_score": 107,
+   "away_score": 115,
    "home_rest": 1,
    "away_rest": 2,
    "home_b2b": true,
@@ -6206,7 +6214,9 @@
    "home_spread": null,
    "total": null,
    "ratings_margin": 8.7,
-   "ratings_total": 222.2
+   "ratings_total": 222.2,
+   "spread_grade": null,
+   "total_grade": null
   },
   {
    "game_id": 401909968,
@@ -6216,9 +6226,9 @@
    "away": "BOS",
    "home_name": "Toronto Raptors",
    "away_name": "Boston Celtics",
-   "final": false,
-   "home_score": null,
-   "away_score": null,
+   "final": true,
+   "home_score": 93,
+   "away_score": 98,
    "home_rest": 2,
    "away_rest": 1,
    "home_b2b": false,
@@ -6230,7 +6240,9 @@
    "home_spread": null,
    "total": null,
    "ratings_margin": -1.2,
-   "ratings_total": 224.7
+   "ratings_total": 224.7,
+   "spread_grade": null,
+   "total_grade": null
   },
   {
    "game_id": 401909969,
@@ -6240,9 +6252,9 @@
    "away": "SA",
    "home_name": "Chicago Bulls",
    "away_name": "San Antonio Spurs",
-   "final": false,
-   "home_score": null,
-   "away_score": null,
+   "final": true,
+   "home_score": 119,
+   "away_score": 124,
    "home_rest": 3,
    "away_rest": 2,
    "home_b2b": false,
@@ -6262,7 +6274,15 @@
    "proj_total": 240.1,
    "total_edge": 0.6,
    "total_pick": "over",
-   "over_chance": 0.513
+   "over_chance": 0.513,
+   "spread_grade": {
+    "result": "loss",
+    "lean": false
+   },
+   "total_grade": {
+    "result": "win",
+    "lean": false
+   }
   },
   {
    "game_id": 401909970,
@@ -6272,9 +6292,9 @@
    "away": "DEN",
    "home_name": "Memphis Grizzlies",
    "away_name": "Denver Nuggets",
-   "final": false,
-   "home_score": null,
-   "away_score": null,
+   "final": true,
+   "home_score": 118,
+   "away_score": 123,
    "home_rest": 2,
    "away_rest": 2,
    "home_b2b": false,
@@ -6294,7 +6314,15 @@
    "proj_total": 228.4,
    "total_edge": -0.1,
    "total_pick": "under",
-   "over_chance": 0.498
+   "over_chance": 0.498,
+   "spread_grade": {
+    "result": "win",
+    "lean": false
+   },
+   "total_grade": {
+    "result": "loss",
+    "lean": false
+   }
   },
   {
    "game_id": 401909971,
@@ -6304,9 +6332,9 @@
    "away": "LAL",
    "home_name": "Milwaukee Bucks",
    "away_name": "Los Angeles Lakers",
-   "final": false,
-   "home_score": null,
-   "away_score": null,
+   "final": true,
+   "home_score": 112,
+   "away_score": 123,
    "home_rest": 1,
    "away_rest": 2,
    "home_b2b": true,
@@ -6318,7 +6346,9 @@
    "home_spread": null,
    "total": null,
    "ratings_margin": -11.4,
-   "ratings_total": 228.3
+   "ratings_total": 228.3,
+   "spread_grade": null,
+   "total_grade": null
   },
   {
    "game_id": 401909972,
@@ -6328,9 +6358,9 @@
    "away": "BKN",
    "home_name": "New Orleans Pelicans",
    "away_name": "Brooklyn Nets",
-   "final": false,
-   "home_score": null,
-   "away_score": null,
+   "final": true,
+   "home_score": 111,
+   "away_score": 145,
    "home_rest": 2,
    "away_rest": 3,
    "home_b2b": false,
@@ -6350,7 +6380,15 @@
    "proj_total": 230.2,
    "total_edge": 0.7,
    "total_pick": "over",
-   "over_chance": 0.517
+   "over_chance": 0.517,
+   "spread_grade": {
+    "result": "win",
+    "lean": false
+   },
+   "total_grade": {
+    "result": "win",
+    "lean": false
+   }
   },
   {
    "game_id": 401909973,
@@ -6360,9 +6398,9 @@
    "away": "ORL",
    "home_name": "Utah Jazz",
    "away_name": "Orlando Magic",
-   "final": false,
-   "home_score": null,
-   "away_score": null,
+   "final": true,
+   "home_score": 108,
+   "away_score": 123,
    "home_rest": 1,
    "away_rest": 1,
    "home_b2b": true,
@@ -6374,7 +6412,9 @@
    "home_spread": null,
    "total": null,
    "ratings_margin": -1.2,
-   "ratings_total": 227.9
+   "ratings_total": 227.9,
+   "spread_grade": null,
+   "total_grade": null
   },
   {
    "game_id": 401909974,
@@ -6384,9 +6424,9 @@
    "away": "GS",
    "home_name": "Houston Rockets",
    "away_name": "Golden State Warriors",
-   "final": false,
-   "home_score": null,
-   "away_score": null,
+   "final": true,
+   "home_score": 115,
+   "away_score": 108,
    "home_rest": 2,
    "away_rest": 2,
    "home_b2b": false,
@@ -6406,7 +6446,15 @@
    "proj_total": 223.6,
    "total_edge": 0.1,
    "total_pick": "over",
-   "over_chance": 0.502
+   "over_chance": 0.502,
+   "spread_grade": {
+    "result": "loss",
+    "lean": false
+   },
+   "total_grade": {
+    "result": "loss",
+    "lean": false
+   }
   },
   {
    "game_id": 401909975,
@@ -6416,9 +6464,9 @@
    "away": "OKC",
    "home_name": "Portland Trail Blazers",
    "away_name": "Oklahoma City Thunder",
-   "final": false,
-   "home_score": null,
-   "away_score": null,
+   "final": true,
+   "home_score": 118,
+   "away_score": 108,
    "home_rest": 1,
    "away_rest": 1,
    "home_b2b": true,
@@ -6430,7 +6478,9 @@
    "home_spread": null,
    "total": null,
    "ratings_margin": 1.1,
-   "ratings_total": 225.5
+   "ratings_total": 225.5,
+   "spread_grade": null,
+   "total_grade": null
   },
   {
    "game_id": 401909976,
@@ -6453,8 +6503,8 @@
    "ml_away": null,
    "home_spread": null,
    "total": null,
-   "ratings_margin": 1.7,
-   "ratings_total": 226.5
+   "ratings_margin": 2.0,
+   "ratings_total": 225.3
   },
   {
    "game_id": 401909977,
@@ -6477,8 +6527,8 @@
    "ml_away": -390.0,
    "home_spread": 9.5,
    "total": 220.5,
-   "ratings_margin": -10.4,
-   "ratings_total": 224.4,
+   "ratings_margin": -10.6,
+   "ratings_total": 224.0,
    "proj_margin": -10.1,
    "spread_edge": -0.6,
    "spread_pick": "DET",
@@ -6486,7 +6536,7 @@
    "proj_total": 220.9,
    "total_edge": 0.4,
    "total_pick": "over",
-   "over_chance": 0.508
+   "over_chance": 0.51
   },
   {
    "game_id": 401909978,
@@ -6547,8 +6597,8 @@
    "spread_edge": -0.2,
    "spread_pick": "CHA",
    "home_cover": 0.495,
-   "proj_total": 214.0,
-   "total_edge": 0.5,
+   "proj_total": 214.1,
+   "total_edge": 0.6,
    "total_pick": "over",
    "over_chance": 0.512
   },
@@ -6573,16 +6623,16 @@
    "ml_away": -125.0,
    "home_spread": 2.5,
    "total": 233.5,
-   "ratings_margin": -8.7,
-   "ratings_total": 223.5,
+   "ratings_margin": -7.1,
+   "ratings_total": 223.2,
    "proj_margin": -2.8,
    "spread_edge": -0.3,
    "spread_pick": "NY",
-   "home_cover": 0.491,
+   "home_cover": 0.492,
    "proj_total": 235.0,
    "total_edge": 1.5,
    "total_pick": "over",
-   "over_chance": 0.532
+   "over_chance": 0.534
   },
   {
    "game_id": 401909297,
@@ -6605,8 +6655,8 @@
    "ml_away": null,
    "home_spread": null,
    "total": null,
-   "ratings_margin": 8.8,
-   "ratings_total": 224.7
+   "ratings_margin": 9.7,
+   "ratings_total": 225.3
   },
   {
    "game_id": 401909298,
@@ -6629,8 +6679,8 @@
    "ml_away": null,
    "home_spread": null,
    "total": null,
-   "ratings_margin": 1.9,
-   "ratings_total": 234.0
+   "ratings_margin": 1.5,
+   "ratings_total": 233.9
   },
   {
    "game_id": 401909299,
@@ -6653,8 +6703,8 @@
    "ml_away": null,
    "home_spread": null,
    "total": null,
-   "ratings_margin": -5.4,
-   "ratings_total": 236.9
+   "ratings_margin": -5.2,
+   "ratings_total": 237.1
   },
   {
    "game_id": 401909300,
@@ -6677,8 +6727,8 @@
    "ml_away": null,
    "home_spread": null,
    "total": null,
-   "ratings_margin": 1.1,
-   "ratings_total": 236.4
+   "ratings_margin": -0.1,
+   "ratings_total": 237.4
   },
   {
    "game_id": 401909301,
@@ -6701,8 +6751,8 @@
    "ml_away": null,
    "home_spread": null,
    "total": null,
-   "ratings_margin": 14.3,
-   "ratings_total": 226.7
+   "ratings_margin": 14.7,
+   "ratings_total": 226.8
   },
   {
    "game_id": 401909302,
@@ -6725,8 +6775,8 @@
    "ml_away": 390.0,
    "home_spread": -10.5,
    "total": 236.5,
-   "ratings_margin": 6.6,
-   "ratings_total": 227.9,
+   "ratings_margin": 7.0,
+   "ratings_total": 228.3,
    "proj_margin": 10.5,
    "spread_edge": -0.0,
    "spread_pick": "GS",
@@ -6757,7 +6807,7 @@
    "ml_away": null,
    "home_spread": null,
    "total": null,
-   "ratings_margin": -7.0,
+   "ratings_margin": -7.3,
    "ratings_total": 229.5
   },
   {
@@ -6781,8 +6831,8 @@
    "ml_away": null,
    "home_spread": null,
    "total": null,
-   "ratings_margin": -2.9,
-   "ratings_total": 226.3
+   "ratings_margin": -2.2,
+   "ratings_total": 226.4
   },
   {
    "game_id": 401909980,
@@ -6805,8 +6855,8 @@
    "ml_away": null,
    "home_spread": null,
    "total": null,
-   "ratings_margin": -4.4,
-   "ratings_total": 234.6
+   "ratings_margin": -5.9,
+   "ratings_total": 235.7
   },
   {
    "game_id": 401909981,
@@ -6829,8 +6879,8 @@
    "ml_away": null,
    "home_spread": null,
    "total": null,
-   "ratings_margin": 0.7,
-   "ratings_total": 230.1
+   "ratings_margin": 1.1,
+   "ratings_total": 229.9
   },
   {
    "game_id": 401909982,
@@ -6877,8 +6927,8 @@
    "ml_away": null,
    "home_spread": null,
    "total": null,
-   "ratings_margin": 6.4,
-   "ratings_total": 228.0
+   "ratings_margin": 4.3,
+   "ratings_total": 229.4
   },
   {
    "game_id": 401909984,
@@ -6901,8 +6951,104 @@
    "ml_away": null,
    "home_spread": null,
    "total": null,
-   "ratings_margin": 15.6,
-   "ratings_total": 234.2
+   "ratings_margin": 15.4,
+   "ratings_total": 234.4
+  },
+  {
+   "game_id": 401909985,
+   "date": "2026-11-15",
+   "tip": "2026-11-15T18:00:00+00:00",
+   "home": "PHI",
+   "away": "IND",
+   "home_name": "Philadelphia 76ers",
+   "away_name": "Indiana Pacers",
+   "final": false,
+   "home_score": null,
+   "away_score": null,
+   "home_rest": 3,
+   "away_rest": 2,
+   "home_b2b": false,
+   "away_b2b": false,
+   "pulled_utc": null,
+   "books": null,
+   "ml_home": null,
+   "ml_away": null,
+   "home_spread": null,
+   "total": null,
+   "ratings_margin": 3.8,
+   "ratings_total": 226.5
+  },
+  {
+   "game_id": 401909986,
+   "date": "2026-11-15",
+   "tip": "2026-11-15T21:00:00+00:00",
+   "home": "PHX",
+   "away": "LAL",
+   "home_name": "Phoenix Suns",
+   "away_name": "Los Angeles Lakers",
+   "final": false,
+   "home_score": null,
+   "away_score": null,
+   "home_rest": 3,
+   "away_rest": 4,
+   "home_b2b": false,
+   "away_b2b": false,
+   "pulled_utc": null,
+   "books": null,
+   "ml_home": null,
+   "ml_away": null,
+   "home_spread": null,
+   "total": null,
+   "ratings_margin": -3.1,
+   "ratings_total": 229.1
+  },
+  {
+   "game_id": 401909987,
+   "date": "2026-11-15",
+   "tip": "2026-11-15T21:30:00+00:00",
+   "home": "LAC",
+   "away": "CHA",
+   "home_name": "LA Clippers",
+   "away_name": "Charlotte Hornets",
+   "final": false,
+   "home_score": null,
+   "away_score": null,
+   "home_rest": 2,
+   "away_rest": 3,
+   "home_b2b": false,
+   "away_b2b": false,
+   "pulled_utc": null,
+   "books": null,
+   "ml_home": null,
+   "ml_away": null,
+   "home_spread": null,
+   "total": null,
+   "ratings_margin": 3.2,
+   "ratings_total": 223.5
+  },
+  {
+   "game_id": 401909988,
+   "date": "2026-11-15",
+   "tip": "2026-11-15T22:00:00+00:00",
+   "home": "UTAH",
+   "away": "SA",
+   "home_name": "Utah Jazz",
+   "away_name": "San Antonio Spurs",
+   "final": false,
+   "home_score": null,
+   "away_score": null,
+   "home_rest": 2,
+   "away_rest": 2,
+   "home_b2b": false,
+   "away_b2b": false,
+   "pulled_utc": null,
+   "books": null,
+   "ml_home": null,
+   "ml_away": null,
+   "home_spread": null,
+   "total": null,
+   "ratings_margin": -11.9,
+   "ratings_total": 229.3
   }
  ]
 }
