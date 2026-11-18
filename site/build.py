@@ -17,6 +17,7 @@ ET = ZoneInfo("America/New_York")
 BASE = "https://stevopotpie.github.io/courtline/"
 GH = "https://github.com/stevopotpie/courtline"
 GRIDLINE = "https://stevopotpie.github.io/gridline/"
+BARTOP = "https://claude.ai/artifact/PnwqjUsuYKyyWzaPuQuHyL"  # The Bartop: shared NFL and NBA question board
 e = html.escape
 
 os.makedirs(DOCS, exist_ok=True)
@@ -35,6 +36,7 @@ PAGES = [  # file, nav label, site map name, description
 ]
 ABOUT = [("Method and results (README)", f"{GH}#readme"), ("Runbook: data, findings, how each run works", f"{GH}/blob/main/RUNBOOK.md"),
          ("Every projection as a CSV", f"{GH}/blob/main/data/predictions.csv"), ("Source code", GH),
+         ("The Bartop: bar-talk questions tested against the data (NFL and NBA)", BARTOP),
          ("Gridline, the NFL companion model", GRIDLINE)]
 
 
@@ -76,7 +78,7 @@ def head(title, desc, page):
 
 def nav(current):
     links = "".join(f'<a href="{f}"{" aria-current=\"page\"" if f == current else ""}>{lab}</a>' for f, lab, _, _ in PAGES if lab)
-    links += f'<a class="ext" href="{GRIDLINE}">Gridline (NFL)</a><a class="ext" href="{GH}">GitHub</a>'
+    links += f'<a class="ext" href="{BARTOP}">The Bartop</a><a class="ext" href="{GRIDLINE}">Gridline (NFL)</a><a class="ext" href="{GH}">GitHub</a>'
     return (f'<nav class="cl-nav" aria-label="Courtline pages"><div class="cl-in">'
             f'<a class="cl-brand" href="./"{" aria-current=\"page\"" if current == "index.html" else ""}><img src="icon.png" alt="" width="26" height="26">Courtline</a>'
             f'<div class="cl-links">{links}</div>'
