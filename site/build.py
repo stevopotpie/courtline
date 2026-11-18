@@ -1,6 +1,7 @@
 """Build the Courtline site (docs/) from data/courtline.json.
 
-Pages: index (home), predictions, research, calculator, bet-log. Each gets the shared top bar (with the odds
+Pages: index (home: today's games live, from site/ingame.py), how-it-works, predictions, research, calculator, bet-log.
+in-game.html is kept as a redirect to the home page so old links still work. Each gets the shared top bar (with the odds
 format switch) and the site map footer. Styles and the odds switch live in site/courtline.css and courtline.js.
 
 Usage: python3 -I site/build.py REPO_DIR
@@ -27,12 +28,12 @@ for f in ("courtline.css", "courtline.js"):
     assets[f] = hashlib.sha1(open(os.path.join(SITE, f), "rb").read()).hexdigest()[:8]
 
 PAGES = [  # file, nav label, site map name, description
-    ("index.html", None, "Home", "What Courtline is and how it has done"),
+    ("index.html", "Today's games", "Home", "Today's games: live scores, win and cover chances, and a check for any live moneyline"),
     ("predictions.html", "Predictions", "Predictions", "Today's games: the market number, Courtline's projection and every graded pick this season"),
-    ("in-game.html", "In-game", "In-game", "Live scores, Courtline's live win chance, and a check for any live moneyline"),
     ("research.html", "Research", "Research", "The backtest, back to backs, home court by season and team ratings"),
     ("calculator.html", "Calculator", "Matchup Calculator", "Pick any two teams, rest and a line to see Courtline's number"),
     ("bet-log.html", "Bet log", "Bet Log", "Log bets, see Courtline's chance against the price, saved in your browser"),
+    ("how-it-works.html", "How it works", "How it works", "What Courtline is, how it is built and how it has done"),
 ]
 ABOUT = [("Method and results (README)", f"{GH}#readme"), ("Runbook: data, findings, how each run works", f"{GH}/blob/main/RUNBOOK.md"),
          ("Every projection as a CSV", f"{GH}/blob/main/data/predictions.csv"), ("Source code", GH),
@@ -206,15 +207,15 @@ def season_chart():
     return '<figure class="panel chart" style="margin:0"><div class="scroll">' + "".join(s) + '</div>' + leg + '</figure>'
 
 
-# ------------------------------------------------------------------ home
+# ------------------------------------------------------------------ how it works (the old home page; the home page is now today's games)
 finals = [g for g in GAMES if g["final"] and g.get("proj_margin") is not None]
 upcoming = [g for g in GAMES if not g["final"]]
 home_body = f"""<main class="wrap">
 <header class="page-head" style="padding-top:3rem">
-  <span class="eyebrow">Courtline · NBA model vs. the betting market</span>
+  <span class="eyebrow">How it works · NBA model vs. the betting market</span>
   <h1>Vegas missed by <span style="color:var(--accent-ink)">{B['vegas_miss_margin']:.2f}</span>. My model missed by <span style="color:var(--accent-ink)">{B['model_miss_margin']:.2f}</span>.</h1>
   <p class="lede">I built an NBA model from public data and tested it on {B['games']:,} games it had never seen. It found no edge against the closing line on sides or totals. Now it runs every day of the {D['season_label']} season, projects every game against the market, and grades itself in public.</p>
-  <div class="actions"><a class="btn primary" href="predictions.html">Today's projections</a><a class="btn" href="research.html">Read the research</a></div>
+  <div class="actions"><a class="btn primary" href="./">Today's games</a><a class="btn" href="predictions.html">Projections</a><a class="btn" href="research.html">Read the research</a></div>
 </header>
 
 {board_html("Backtest v0 · walk forward", f"{B['games']:,} games · {B['seasons']}",
@@ -267,7 +268,7 @@ home_css = """<style>
 .card:hover{border-color:var(--accent)}.card h3{color:var(--accent-ink)}.card p{color:var(--muted);font-size:.95rem}
 </style>
 """
-page("index.html", "Courtline: an NBA model tested against the betting market",
+page("how-it-works.html", "How Courtline works: an NBA model tested against the betting market",
      "An NBA model built on public data and tested against Vegas closing lines, run daily and graded in public. By Steven Sutcliffe.",
      home_css + home_body)
 

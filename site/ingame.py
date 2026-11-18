@@ -15,9 +15,12 @@ for g in GAMES:
     else:
         mu, src = g["ratings_margin"], "ratings"
     pregame[str(g["game_id"])] = dict(mu=mu, src=src, home=g["home"], away=g["away"], hn=g["home_name"], an=g["away_name"],
-                                      home_rest=g["home_rest"], away_rest=g["away_rest"], spread=g.get("home_spread"),
+                                      home_rest=g["home_rest"], away_rest=g["away_rest"], spread=g.get("home_spread"), total=g.get("total"),
                                       ml_home=g.get("ml_home"), ml_away=g.get("ml_away"), tip=g["tip"])
-ig_data = dict(live=dict(a=LM["a"], b=LM["b"], d=LM["d"]), pregame=pregame,
+# Cover chance: the final margin vs the pregame spread is treated as normal around the market's expected margin, with the
+# spread's typical miss (average absolute miss x sqrt(pi/2)) scaled by the share of the game left. At tip it is 50% by design.
+COVER_SD = round(D["backtest"]["vegas_miss_margin"] * math.sqrt(math.pi / 2), 2)
+ig_data = dict(live=dict(a=LM["a"], b=LM["b"], d=LM["d"]), sd=COVER_SD, pregame=pregame,
                teams=[dict(team=r["team"], name=r["name"], ortg=r["ortg"], drtg=r["drtg"]) for r in D["ratings"]],
                rm=M["ratings_margin"])
 
@@ -29,9 +32,9 @@ TOGI = ('<div class="odds-toggle inline" role="group" aria-label="Odds format"><
 
 ig_body = f"""<main class="wrap wide">
 <header class="page-head">
-  <span class="eyebrow">In-game · live</span>
-  <h1>Live win chances</h1>
-  <p class="lede">Today's games with live scores, Courtline's chance that each team wins from here, and a check for any live moneyline you are looking at. Type the price your book shows and see whether it is worth it right now.</p>
+  <span class="eyebrow">Courtline · The Ultimate Sports Betting Sandbox</span>
+  <h1>Today's games</h1>
+  <p class="lede">Every NBA game today with live scores, the pregame line, and Courtline's chance that each team wins and covers from here. Type the price your book shows to see whether it is worth it right now. New here? <a href="how-it-works.html">How it works</a>.</p>
   <div class="ig-status"><span class="dot" id="ig-dot" aria-hidden="true"></span><span id="ig-status" class="small muted">Loading live scores…</span>
     <button type="button" class="btn small" id="ig-refresh">Refresh now</button><span class="small muted">Prices as</span>{TOGI}</div>
 </header>
@@ -63,6 +66,7 @@ ig_body = f"""<main class="wrap wide">
     <div class="panel scroll" style="padding:0"><table class="t"><thead><tr><th>Courtline said</th><th class="r">Game states</th><th class="r">Average</th><th class="r">Home team won</th></tr></thead><tbody>{cal_rows}</tbody></table></div>
     <div class="panel scroll" style="padding:0"><table class="t"><thead><tr><th>Quarter</th><th class="r">Picked winner</th><th class="r">Brier score</th></tr></thead><tbody>{q_rows}</tbody></table></div>
   </div>
+  <p><strong>Win vs. cover.</strong> Win is the chance a team wins the game. Cover is the chance it beats the pregame spread, which is built to be close to a coin flip: before tip it reads 50% for both sides, then moves with the score. A big favorite can be 85% to win and still only 50% to cover. The cover chance treats the final margin as landing around the market's expected margin with the spread's usual miss (about {COVER_SD:.0f} points at tip, shrinking as the clock runs). It has not been backtested on its own the way the win chance has.</p>
   <p class="small muted">Brier score is the average squared miss of the chance (0 is perfect, 0.25 is a coin flip). What it does not know: who has the ball, fouls to give, timeouts, injuries during the game, or a team resting its starters in a blowout. The last minute or two of a close game moves faster than any model, and live prices can change before you place a bet. If gambling stops being fun, call or text 1-800-GAMBLER.</p>
 </section>
 </main>
@@ -78,10 +82,13 @@ ig_css = """<style>
 .ig-top{display:flex;justify-content:space-between;gap:.5rem;align-items:baseline;flex-wrap:wrap}
 .ig-state{font:600 .78rem var(--font-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
 .ig.live .ig-state{color:var(--accent-ink)}
-.ig-row{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:.2rem .9rem;align-items:baseline}
+.ig-row{display:grid;grid-template-columns:minmax(0,1fr) auto auto auto;gap:.2rem .9rem;align-items:baseline}
 .ig-row .tm{font-weight:600;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .ig-row .sc{font:600 1.6rem var(--font-mono);font-variant-numeric:tabular-nums;text-align:right}
 .ig-row .ch{font:600 1rem var(--font-mono);font-variant-numeric:tabular-nums;text-align:right;min-width:4.2rem}
+.ig-h{font:600 .68rem var(--font-body);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.ig-h span{text-align:right}
+.ig-row .cv{font:500 .9rem var(--font-mono);font-variant-numeric:tabular-nums;text-align:right;min-width:4.2rem;color:var(--muted);white-space:nowrap}
 .ig-bar{display:flex;height:8px;border-radius:999px;overflow:hidden;background:var(--sunk)}
 .ig-bar span{display:block;height:100%;transition:width .4s ease}
 .ig-bar .a{background:var(--muted)}.ig-bar .h{background:var(--accent)}
@@ -107,6 +114,14 @@ function winHome(margin, secs, mu){
   var tau = secs / 2880 + L.d, z = L.a * margin / Math.sqrt(tau) + L.b * mu * Math.sqrt(tau);
   return 1 / (1 + Math.exp(-z));
 }
+function erf(x){ var t = 1 / (1 + 0.3275911 * Math.abs(x)), y = 1 - (((((1.061405429 * t - 1.453152027) * t) + 1.421413741) * t - 0.284496736) * t + 0.254829592) * t * Math.exp(-x * x); return x >= 0 ? y : -y; }
+function coverHome(margin, secs, mu, spread){   // chance the home team beats its pregame spread from here
+  var m = margin + spread;
+  if (secs <= 0) return m > 0 ? 1 : m < 0 ? 0 : 0.5;
+  var f = secs / 2880, z = (m + mu * f) / (D.sd * Math.sqrt(f + L.d));
+  return 0.5 * (1 + erf(z / Math.SQRT2));
+}
+function sp(x){ return x > 0 ? "+" + x : x < 0 ? "\u2212" + Math.abs(x) : "PK"; }
 function ratingsMu(h, a){
   var th = T[h], ta = T[a]; if (!th || !ta) return 0;
   var c = D.rm; return c.intercept + c.d_net * ((th.ortg - th.drtg) - (ta.ortg - ta.drtg));
@@ -132,8 +147,9 @@ function verdict(teamA, teamH, ph, pa, phm){
 var cards = {}, games = {};
 function cardHTML(id){
   return '<article class="ig" id="g-' + id + '"><div class="ig-top"><span class="ig-state"></span><span class="small muted ig-pre"></span></div>' +
-    '<div class="ig-row"><span class="tm ig-an"></span><span class="sc ig-as"></span><span class="ch ig-ac"></span></div>' +
-    '<div class="ig-row"><span class="tm ig-hn"></span><span class="sc ig-hs"></span><span class="ch ig-hc"></span></div>' +
+    '<div class="ig-row ig-h"><span></span><span></span><span>Win</span><span class="ig-cvh">Cover</span></div>' +
+    '<div class="ig-row"><span class="tm ig-an"></span><span class="sc ig-as"></span><span class="ch ig-ac"></span><span class="cv ig-acv"></span></div>' +
+    '<div class="ig-row"><span class="tm ig-hn"></span><span class="sc ig-hs"></span><span class="ch ig-hc"></span><span class="cv ig-hcv"></span></div>' +
     '<div class="ig-bar" aria-hidden="true"><span class="a"></span><span class="h"></span></div>' +
     '<div class="small muted ig-fair"></div>' +
     '<div class="ig-prices"><input type="number" step="any" inputmode="decimal" class="ig-pa" aria-label="Away live moneyline"><input type="number" step="any" inputmode="decimal" class="ig-ph" aria-label="Home live moneyline"></div>' +
@@ -147,11 +163,16 @@ function paintCard(id){
   var margin = g.hs - g.as_, ph = g.state === "post" ? (margin > 0 ? 1 : 0) : winHome(margin, secs, mu);
   c.classList.toggle("live", g.state === "in");
   q(c, "ig-state").textContent = g.detail;
-  q(c, "ig-pre").textContent = g.state === "post" ? "" : pre && pre.spread != null ? "Pregame: " + (pre.spread < 0 ? g.home + " −" + Math.abs(pre.spread) : pre.spread > 0 ? g.away + " −" + pre.spread : "Pick'em") :
+  q(c, "ig-pre").textContent = pre && pre.spread != null ? "Pregame spread: " + (pre.spread < 0 ? g.home + " −" + Math.abs(pre.spread) : pre.spread > 0 ? g.away + " −" + pre.spread : "Pick'em") + (pre.total != null ? " · Total " + pre.total : "") : g.state === "post" ? "" :
     (pre ? "Pregame: Courtline " + (mu >= 0 ? g.home : g.away) + " by " + Math.abs(mu).toFixed(1) : "No pregame number; ratings only");
   q(c, "ig-an").textContent = g.an; q(c, "ig-hn").textContent = g.hn;
   q(c, "ig-as").textContent = g.state === "pre" ? "" : g.as_; q(c, "ig-hs").textContent = g.state === "pre" ? "" : g.hs;
   q(c, "ig-ac").textContent = pc(1 - ph); q(c, "ig-hc").textContent = pc(ph);
+  var hasSp = !!(pre && pre.spread != null), chc = hasSp ? (g.state === "post" ? (margin + pre.spread > 0 ? 1 : margin + pre.spread < 0 ? 0 : 0.5) : coverHome(margin, secs, pre.mu, pre.spread)) : null;
+  function cvText(p){ return g.state === "post" ? (p > 0.5 ? "Yes" : p < 0.5 ? "No" : "Push") : pc(p); }
+  q(c, "ig-cvh").textContent = hasSp ? "Cover" : "";
+  q(c, "ig-acv").textContent = hasSp ? sp(-pre.spread) + " " + cvText(1 - chc) : "";
+  q(c, "ig-hcv").textContent = hasSp ? sp(pre.spread) + " " + cvText(chc) : "";
   q(c, "a").style.width = (100 * (1 - ph)).toFixed(1) + "%"; q(c, "h").style.width = (100 * ph).toFixed(1) + "%";
   var done = g.state === "post";
   q(c, "ig-prices").hidden = done;
@@ -236,6 +257,12 @@ manual(); load(); start();
 })();
 </script>
 """.replace("__DATA__", json.dumps(ig_data, separators=(",", ":")))
-page("in-game.html", "Courtline In-game",
-     "Live NBA scores with Courtline's live win chance for each team, plus a check for any live moneyline price.",
+page("index.html", "Courtline: today's NBA games, live win and cover chances",
+     "The Ultimate Sports Betting Sandbox: every NBA game today with the line, live scores, and Courtline's chance that each team wins and covers. By Steven Sutcliffe.",
      ig_css + ig_body, ig_js)
+
+# Old address: the live board used to live at in-game.html. Send visitors to the home page.
+with open(os.path.join(DOCS, "in-game.html"), "w", encoding="utf-8") as f:
+    f.write('<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Courtline: today\'s games</title>'
+            f'<link rel="canonical" href="{BASE}"><meta http-equiv="refresh" content="0; url=./">'
+            '<meta name="robots" content="noindex"></head><body><p>The live board moved to the <a href="./">Courtline home page</a>.</p></body></html>\n')
