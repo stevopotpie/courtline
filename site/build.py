@@ -18,7 +18,7 @@ ET = ZoneInfo("America/New_York")
 BASE = "https://stevopotpie.github.io/courtline/"
 GH = "https://github.com/stevopotpie/courtline"
 GRIDLINE = "https://stevopotpie.github.io/gridline/"
-BARTOP = "https://claude.ai/artifact/PnwqjUsuYKyyWzaPuQuHyL"  # The Bartop: shared NFL and NBA question board
+BARTOP = "bartop.html"  # The Bartop: shared NFL and NBA question board (page body in site/bartop_body.html, data in /gridline/bartop.json)
 e = html.escape
 
 os.makedirs(DOCS, exist_ok=True)
@@ -34,10 +34,10 @@ PAGES = [  # file, nav label, site map name, description
     ("calculator.html", "Calculator", "Matchup Calculator", "Pick any two teams, rest and a line to see Courtline's number"),
     ("bet-log.html", "Bet log", "Bet Log", "Log bets, see Courtline's chance against the price, saved in your browser"),
     ("how-it-works.html", "How it works", "How it works", "What Courtline is, how it is built and how it has done"),
+    ("bartop.html", "The Bartop", "The Bartop", "Bar theories tested against the data, NFL and NBA, and a place to ask your own"),
 ]
 ABOUT = [("Method and results (README)", f"{GH}#readme"), ("Runbook: data, findings, how each run works", f"{GH}/blob/main/RUNBOOK.md"),
          ("Every projection as a CSV", f"{GH}/blob/main/data/predictions.csv"), ("Source code", GH),
-         ("The Bartop: bar-talk questions tested against the data (NFL and NBA)", BARTOP),
          ("Gridline, the NFL companion model", GRIDLINE)]
 
 
@@ -79,7 +79,7 @@ def head(title, desc, page):
 
 def nav(current):
     links = "".join(f'<a href="{f}"{" aria-current=\"page\"" if f == current else ""}>{lab}</a>' for f, lab, _, _ in PAGES if lab)
-    links += f'<a class="ext" href="{BARTOP}">The Bartop</a><a class="ext" href="{GRIDLINE}">Gridline (NFL)</a><a class="ext" href="{GH}">GitHub</a>'
+    links += f'<a class="ext" href="{GRIDLINE}">Gridline (NFL)</a><a class="ext" href="{GH}">GitHub</a>'
     return (f'<nav class="cl-nav" aria-label="Courtline pages"><div class="cl-in">'
             f'<a class="cl-brand" href="./"{" aria-current=\"page\"" if current == "index.html" else ""}><img src="icon.png" alt="" width="26" height="26">Courtline</a>'
             f'<div class="cl-links">{links}</div>'
@@ -839,5 +839,10 @@ page("bet-log.html", "Courtline Bet Log",
      bet_css + bet_body, bet_js)
 
 exec(open(os.path.join(SITE, "ingame.py"), encoding="utf-8").read())
+
+# The Bartop: the same public page as Gridline's (verdicts and the On tap list load from /gridline/bartop.json)
+page("bartop.html", "The Bartop: betting theories tested against the data | Courtline",
+     "Bar talk put to the test: NFL and NBA betting theories checked against every game in the data, with verdicts of held up, busted or partly. Ask your own.",
+     '<main class="wrap" style="padding-top:2rem;padding-bottom:3rem">' + open(os.path.join(SITE, "bartop_body.html"), encoding="utf-8").read().replace("__SITE__", "courtline") + "</main>")
 
 print("built", ", ".join(f for f, *_ in PAGES), "| upcoming", len(upcoming), "| graded", S["graded"])
