@@ -79,9 +79,10 @@ def head(title, desc, page):
 
 def nav(current):
     links = "".join(f'<a href="{f}"{" aria-current=\"page\"" if f == current else ""}>{lab}</a>' for f, lab, _, _ in PAGES if lab)
-    links += f'<a class="ext" href="{GRIDLINE}">Gridline (NFL)</a><a class="ext" href="{GH}">GitHub</a>'
+    links += f'<a class="ext" href="{GH}">GitHub</a>'
     return (f'<nav class="cl-nav" aria-label="Courtline pages"><div class="cl-in">'
             f'<a class="cl-brand" href="./"{" aria-current=\"page\"" if current == "index.html" else ""}><img src="icon.png" alt="" width="26" height="26">Courtline</a>'
+            f'<span class="sb-sw" role="group" aria-label="Switch sport"><a href="{GRIDLINE}" title="Gridline, the NFL model">NFL</a><a class="on" href="./" aria-current="true" title="Courtline, the NBA model">NBA</a></span>'
             f'<div class="cl-links">{links}</div>'
             f'<div class="odds-toggle" role="group" aria-label="Show odds as"><span class="ot-l">Odds</span><button type="button" data-fmt="am" aria-pressed="true" title="American odds">&minus;110</button>'
             f'<button type="button" data-fmt="dec" aria-pressed="false" title="Decimal odds">1.91x</button></div></div></nav>\n')
