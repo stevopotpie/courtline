@@ -224,7 +224,7 @@ date,away,home,home_spread,total,proj_margin,proj_total,spread_edge,total_edge,s
 2026-11-19,GS,MEM,,,,,,,,,,
 2026-11-19,POR,MIL,,,,,,,,,,
 2026-11-19,NY,MIN,,,,,,,,,,
-2026-11-19,LAC,SA,,,,,,,,,,
+2026-11-19,LAC,SA,-16.5,225.25,16.6,225.5,0.1,0.3,SA,over,,
 2026-11-20,CHA,ATL,,,,,,,,,,
 2026-11-20,ORL,BKN,,,,,,,,,,
 2026-11-20,IND,CLE,,,,,,,,,,
@@ -239,3 +239,4 @@ date,away,home,home_spread,total,proj_margin,proj_total,spread_edge,total_edge,s
 2026-11-21,LAC,DAL,,,,,,,,,,
 2026-11-21,MEM,MIN,,,,,,,,,,
 2026-11-21,NO,SA,,,,,,,,,,
+2026-11-21,BOS,SAC,,,,,,,,,,

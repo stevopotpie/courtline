@@ -1,43 +1,43 @@
 {
- "built_utc": "2026-11-19T02:06:53.814088+00:00",
+ "built_utc": "2026-11-19T03:52:11.335261+00:00",
  "season_label": "2026\u201327",
  "data_through": "2026-11-17",
- "latest_pull": "2026-11-18T03:52:38.311825+00:00",
- "snapshots": 24,
+ "latest_pull": "2026-11-19T03:51:51.569525+00:00",
+ "snapshots": 25,
  "thresholds": {
   "spread": 1.0,
   "total": 1.5
  },
  "model": {
   "spread": {
-   "intercept": -0.08717265834580638,
+   "intercept": -0.08717265834580655,
    "d_net": 0.015207897210092568,
-   "h_b2b": -0.14852389609640448,
-   "a_b2b": 0.15182600618315653,
-   "rest_diff": 0.08425698070427151
+   "h_b2b": -0.14852389609640343,
+   "a_b2b": 0.15182600618315645,
+   "rest_diff": 0.08425698070427172
   },
   "total": {
-   "intercept": 46.72690048551585,
-   "exp_total": -0.051912801593631215,
-   "pace_sum": -0.1811318516264514,
-   "off_sum": -0.08531201582276247,
-   "def_sum": 0.005886209097397811,
-   "h_b2b": 0.012563003749733199,
-   "a_b2b": 0.6245789613148,
-   "v_total": 0.08718361404710376
+   "intercept": 46.7269004855061,
+   "exp_total": -0.05191280159367499,
+   "pace_sum": -0.18113185162640308,
+   "off_sum": -0.08531201582274053,
+   "def_sum": 0.005886209097419788,
+   "h_b2b": 0.012563003749733275,
+   "a_b2b": 0.6245789613148004,
+   "v_total": 0.08718361404710402
   },
   "ratings_margin": {
-   "intercept": 2.6068371137225896,
-   "d_net": 0.8291810158440359,
-   "h_b2b": -1.7690624429873831,
-   "a_b2b": 2.072460737370467,
-   "rest_diff": -0.009552036532207443
+   "intercept": 2.606837113722586,
+   "d_net": 0.8291810158440365,
+   "h_b2b": -1.7690624429874264,
+   "a_b2b": 2.0724607373705157,
+   "rest_diff": -0.009552036532222254
   },
   "ratings_total": {
-   "intercept": -27.240674828545224,
-   "exp_total": 1.1268685031738122,
-   "h_b2b": -0.3297301421126459,
-   "a_b2b": 0.33552470172279714
+   "intercept": -27.240674828545167,
+   "exp_total": 1.126868503173812,
+   "h_b2b": -0.32973014211264917,
+   "a_b2b": 0.3355247017227989
   },
   "sd_margin": 13.54,
   "sd_total": 18.03,
@@ -8313,14 +8313,22 @@
    "away_rest": 2,
    "home_b2b": false,
    "away_b2b": false,
-   "pulled_utc": null,
-   "books": null,
-   "ml_home": null,
-   "ml_away": null,
-   "home_spread": null,
-   "total": null,
+   "pulled_utc": "2026-11-19T03:51:51.569525+00:00",
+   "books": 8,
+   "ml_home": -1205.0,
+   "ml_away": 750.0,
+   "home_spread": -16.5,
+   "total": 225.25,
    "ratings_margin": 11.8,
-   "ratings_total": 226.4
+   "ratings_total": 226.4,
+   "proj_margin": 16.6,
+   "spread_edge": 0.1,
+   "spread_pick": "SA",
+   "home_cover": 0.502,
+   "proj_total": 225.5,
+   "total_edge": 0.3,
+   "total_pick": "over",
+   "over_chance": 0.506
   },
   {
    "game_id": 401909305,
@@ -8673,6 +8681,30 @@
    "total": null,
    "ratings_margin": 16.8,
    "ratings_total": 230.5
+  },
+  {
+   "game_id": 401910028,
+   "date": "2026-11-21",
+   "tip": "2026-11-22T03:00:00+00:00",
+   "home": "SAC",
+   "away": "BOS",
+   "home_name": "Sacramento Kings",
+   "away_name": "Boston Celtics",
+   "final": false,
+   "home_score": null,
+   "away_score": null,
+   "home_rest": 1,
+   "away_rest": 3,
+   "home_b2b": true,
+   "away_b2b": false,
+   "pulled_utc": null,
+   "books": null,
+   "ml_home": null,
+   "ml_away": null,
+   "home_spread": null,
+   "total": null,
+   "ratings_margin": -14.6,
+   "ratings_total": 224.0
   }
  ]
 }
