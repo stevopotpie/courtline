@@ -28,7 +28,7 @@ for f in ("courtline.css", "courtline.js"):
     assets[f] = hashlib.sha1(open(os.path.join(SITE, f), "rb").read()).hexdigest()[:8]
 
 PAGES = [  # file, nav label, site map name, description
-    ("index.html", "Today's games", "Home", "Today's games: live scores, win and cover chances, and a check for any live moneyline"),
+    ("index.html", "Today's games", "Home", "Today's games: the line, live scores, chance to win, and a check for any live moneyline"),
     ("predictions.html", "Predictions", "Predictions", "Today's games: the market number, Courtline's projection and every graded pick this season"),
     ("research.html", "Research", "Research", "The backtest, back to backs, home court by season and team ratings"),
     ("calculator.html", "Calculator", "Matchup Calculator", "Pick any two teams, rest and a line to see Courtline's number"),

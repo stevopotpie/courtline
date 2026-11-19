@@ -17,10 +17,7 @@ for g in GAMES:
     pregame[str(g["game_id"])] = dict(mu=mu, src=src, home=g["home"], away=g["away"], hn=g["home_name"], an=g["away_name"],
                                       home_rest=g["home_rest"], away_rest=g["away_rest"], spread=g.get("home_spread"), total=g.get("total"),
                                       ml_home=g.get("ml_home"), ml_away=g.get("ml_away"), tip=g["tip"])
-# Cover chance: the final margin vs the pregame spread is treated as normal around the market's expected margin, with the
-# spread's typical miss (average absolute miss x sqrt(pi/2)) scaled by the share of the game left. At tip it is 50% by design.
-COVER_SD = round(D["backtest"]["vegas_miss_margin"] * math.sqrt(math.pi / 2), 2)
-ig_data = dict(live=dict(a=LM["a"], b=LM["b"], d=LM["d"]), sd=COVER_SD, pregame=pregame,
+ig_data = dict(live=dict(a=LM["a"], b=LM["b"], d=LM["d"]), pregame=pregame,
                teams=[dict(team=r["team"], name=r["name"], ortg=r["ortg"], drtg=r["drtg"]) for r in D["ratings"]],
                rm=M["ratings_margin"])
 
@@ -34,7 +31,7 @@ ig_body = f"""<main class="wrap wide">
 <header class="page-head">
   <span class="eyebrow">Courtline · The Ultimate Sports Betting Sandbox</span>
   <h1>Today's games</h1>
-  <p class="lede">Every NBA game today with live scores, the pregame line, and Courtline's chance that each team wins and covers from here. Type the price your book shows to see whether it is worth it right now. New here? <a href="how-it-works.html">How it works</a>.</p>
+  <p class="lede">Every NBA game today with live scores, the pregame line, and Courtline's chance that each team wins from here. Type the price your book shows to see whether it is worth it right now. New here? <a href="how-it-works.html">How it works</a>.</p>
   <div class="ig-status"><span class="dot" id="ig-dot" aria-hidden="true"></span><span id="ig-status" class="small muted">Loading live scores…</span>
     <button type="button" class="btn small" id="ig-refresh">Refresh now</button><span class="small muted">Prices as</span>{TOGI}</div>
 </header>
@@ -66,7 +63,7 @@ ig_body = f"""<main class="wrap wide">
     <div class="panel scroll" style="padding:0"><table class="t"><thead><tr><th>Courtline said</th><th class="r">Game states</th><th class="r">Average</th><th class="r">Home team won</th></tr></thead><tbody>{cal_rows}</tbody></table></div>
     <div class="panel scroll" style="padding:0"><table class="t"><thead><tr><th>Quarter</th><th class="r">Picked winner</th><th class="r">Brier score</th></tr></thead><tbody>{q_rows}</tbody></table></div>
   </div>
-  <p><strong>Win vs. cover.</strong> Win is the chance a team wins the game. Cover is the chance it beats the pregame spread, which is built to be close to a coin flip: before tip it reads 50% for both sides, then moves with the score. A big favorite can be 85% to win and still only 50% to cover. The cover chance treats the final margin as landing around the market's expected margin with the spread's usual miss (about {COVER_SD:.0f} points at tip, shrinking as the clock runs). It has not been backtested on its own the way the win chance has.</p>
+  <p><strong>Reading a card.</strong> <em>To win</em> is Courtline's chance that the team wins the game outright, the same bet as the moneyline. It is not the chance to cover. <em>Spread</em> is the pregame line, and <em>Spread odds</em> is its price, shown at the standard &minus;110 (1.91x) since the feed does not carry each book's spread price; check your book. Spreads are set so each side is close to a coin flip, which is why a team can be 85% to win and still only an even bet against the spread. After the final, the odds column shows whether each side covered.</p>
   <p class="small muted">Brier score is the average squared miss of the chance (0 is perfect, 0.25 is a coin flip). What it does not know: who has the ball, fouls to give, timeouts, injuries during the game, or a team resting its starters in a blowout. The last minute or two of a close game moves faster than any model, and live prices can change before you place a bet. If gambling stops being fun, call or text 1-800-GAMBLER.</p>
 </section>
 </main>
@@ -88,7 +85,8 @@ ig_css = """<style>
 .ig-row .ch{font:600 1rem var(--font-mono);font-variant-numeric:tabular-nums;text-align:right;min-width:4.2rem}
 .ig-h{font:600 .68rem var(--font-body);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
 .ig-h span{text-align:right}
-.ig-row .cv{font:500 .9rem var(--font-mono);font-variant-numeric:tabular-nums;text-align:right;min-width:4.2rem;color:var(--muted);white-space:nowrap}
+.ig-row.r5{grid-template-columns:minmax(0,1fr) auto auto auto auto;gap:.2rem .7rem}
+.ig-row .cv{font:500 .9rem var(--font-mono);font-variant-numeric:tabular-nums;text-align:right;color:var(--muted);white-space:nowrap}
 .ig-bar{display:flex;height:8px;border-radius:999px;overflow:hidden;background:var(--sunk)}
 .ig-bar span{display:block;height:100%;transition:width .4s ease}
 .ig-bar .a{background:var(--muted)}.ig-bar .h{background:var(--accent)}
@@ -114,13 +112,7 @@ function winHome(margin, secs, mu){
   var tau = secs / 2880 + L.d, z = L.a * margin / Math.sqrt(tau) + L.b * mu * Math.sqrt(tau);
   return 1 / (1 + Math.exp(-z));
 }
-function erf(x){ var t = 1 / (1 + 0.3275911 * Math.abs(x)), y = 1 - (((((1.061405429 * t - 1.453152027) * t) + 1.421413741) * t - 0.284496736) * t + 0.254829592) * t * Math.exp(-x * x); return x >= 0 ? y : -y; }
-function coverHome(margin, secs, mu, spread){   // chance the home team beats its pregame spread from here
-  var m = margin + spread;
-  if (secs <= 0) return m > 0 ? 1 : m < 0 ? 0 : 0.5;
-  var f = secs / 2880, z = (m + mu * f) / (D.sd * Math.sqrt(f + L.d));
-  return 0.5 * (1 + erf(z / Math.SQRT2));
-}
+var SPREAD_PRICE = -110;   // standard spread price; the odds feed does not carry each book's spread price
 function sp(x){ return x > 0 ? "+" + x : x < 0 ? "\u2212" + Math.abs(x) : "PK"; }
 function ratingsMu(h, a){
   var th = T[h], ta = T[a]; if (!th || !ta) return 0;
@@ -147,9 +139,9 @@ function verdict(teamA, teamH, ph, pa, phm){
 var cards = {}, games = {};
 function cardHTML(id){
   return '<article class="ig" id="g-' + id + '"><div class="ig-top"><span class="ig-state"></span><span class="small muted ig-pre"></span></div>' +
-    '<div class="ig-row ig-h"><span></span><span></span><span>Win</span><span class="ig-cvh">Cover</span></div>' +
-    '<div class="ig-row"><span class="tm ig-an"></span><span class="sc ig-as"></span><span class="ch ig-ac"></span><span class="cv ig-acv"></span></div>' +
-    '<div class="ig-row"><span class="tm ig-hn"></span><span class="sc ig-hs"></span><span class="ch ig-hc"></span><span class="cv ig-hcv"></span></div>' +
+    '<div class="ig-row r5 ig-h"><span></span><span></span><span>To win</span><span>Spread</span><span>Spread odds</span></div>' +
+    '<div class="ig-row r5"><span class="tm ig-an"></span><span class="sc ig-as"></span><span class="ch ig-ac"></span><span class="cv ig-asp"></span><span class="cv ig-aod"></span></div>' +
+    '<div class="ig-row r5"><span class="tm ig-hn"></span><span class="sc ig-hs"></span><span class="ch ig-hc"></span><span class="cv ig-hsp"></span><span class="cv ig-hod"></span></div>' +
     '<div class="ig-bar" aria-hidden="true"><span class="a"></span><span class="h"></span></div>' +
     '<div class="small muted ig-fair"></div>' +
     '<div class="ig-prices"><input type="number" step="any" inputmode="decimal" class="ig-pa" aria-label="Away live moneyline"><input type="number" step="any" inputmode="decimal" class="ig-ph" aria-label="Home live moneyline"></div>' +
@@ -168,11 +160,15 @@ function paintCard(id){
   q(c, "ig-an").textContent = g.an; q(c, "ig-hn").textContent = g.hn;
   q(c, "ig-as").textContent = g.state === "pre" ? "" : g.as_; q(c, "ig-hs").textContent = g.state === "pre" ? "" : g.hs;
   q(c, "ig-ac").textContent = pc(1 - ph); q(c, "ig-hc").textContent = pc(ph);
-  var hasSp = !!(pre && pre.spread != null), chc = hasSp ? (g.state === "post" ? (margin + pre.spread > 0 ? 1 : margin + pre.spread < 0 ? 0 : 0.5) : coverHome(margin, secs, pre.mu, pre.spread)) : null;
-  function cvText(p){ return g.state === "post" ? (p > 0.5 ? "Yes" : p < 0.5 ? "No" : "Push") : pc(p); }
-  q(c, "ig-cvh").textContent = hasSp ? "Cover" : "";
-  q(c, "ig-acv").textContent = hasSp ? sp(-pre.spread) + " " + cvText(1 - chc) : "";
-  q(c, "ig-hcv").textContent = hasSp ? sp(pre.spread) + " " + cvText(chc) : "";
+  var hasSp = !!(pre && pre.spread != null);
+  function odd(side){   // home side's line is pre.spread; after the final, did that side cover
+    if (!hasSp) return "";
+    if (g.state !== "post") return CL.fmt(SPREAD_PRICE);
+    var m = (side === "home" ? 1 : -1) * (margin + pre.spread);
+    return m > 0 ? "Covered" : m < 0 ? "Missed" : "Push";
+  }
+  q(c, "ig-asp").textContent = hasSp ? sp(-pre.spread) : "–"; q(c, "ig-hsp").textContent = hasSp ? sp(pre.spread) : "–";
+  q(c, "ig-aod").textContent = odd("away"); q(c, "ig-hod").textContent = odd("home");
   q(c, "a").style.width = (100 * (1 - ph)).toFixed(1) + "%"; q(c, "h").style.width = (100 * ph).toFixed(1) + "%";
   var done = g.state === "post";
   q(c, "ig-prices").hidden = done;
@@ -257,8 +253,8 @@ manual(); load(); start();
 })();
 </script>
 """.replace("__DATA__", json.dumps(ig_data, separators=(",", ":")))
-page("index.html", "Courtline: today's NBA games, live win and cover chances",
-     "The Ultimate Sports Betting Sandbox: every NBA game today with the line, live scores, and Courtline's chance that each team wins and covers. By Steven Sutcliffe.",
+page("index.html", "Courtline: today's NBA games, lines and live win chances",
+     "The Ultimate Sports Betting Sandbox: every NBA game today with the line, live scores, and Courtline's chance that each team wins. By Steven Sutcliffe.",
      ig_css + ig_body, ig_js)
 
 # Old address: the live board used to live at in-game.html. Send visitors to the home page.
