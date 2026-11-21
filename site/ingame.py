@@ -63,7 +63,7 @@ ig_body = f"""<main class="wrap wide">
     <div class="panel scroll" style="padding:0"><table class="t"><thead><tr><th>Courtline said</th><th class="r">Game states</th><th class="r">Average</th><th class="r">Home team won</th></tr></thead><tbody>{cal_rows}</tbody></table></div>
     <div class="panel scroll" style="padding:0"><table class="t"><thead><tr><th>Quarter</th><th class="r">Picked winner</th><th class="r">Brier score</th></tr></thead><tbody>{q_rows}</tbody></table></div>
   </div>
-  <p><strong>Reading a card.</strong> <em>To win</em> is Courtline's chance that the team wins the game outright, the same bet as the moneyline. It is not the chance to cover. <em>Spread</em> is the pregame line, and <em>Spread odds</em> is its price, shown at the standard &minus;110 (1.91x) since the feed does not carry each book's spread price; check your book. Spreads are set so each side is close to a coin flip, which is why a team can be 85% to win and still only an even bet against the spread. After the final, the odds column shows whether each side covered.</p>
+  <p><strong>Reading a card.</strong> <em>To win</em> is Courtline's chance that the team wins the game outright, the same bet as the moneyline. It is not the chance to cover. The price under it is that chance as straight moneyline odds with no book cut, so a book paying more than that is offering value. <em>Spread</em> is the pregame line, and <em>Odds</em> is the spread's price, shown at the standard &minus;110 (1.91x) since the feed does not carry each book's spread price; check your book. Spreads are set so each side is close to a coin flip, which is why a team can be 85% to win and still only an even bet against the spread. After the final, the odds column shows whether each side covered.</p>
   <p class="small muted">Brier score is the average squared miss of the chance (0 is perfect, 0.25 is a coin flip). What it does not know: who has the ball, fouls to give, timeouts, injuries during the game, or a team resting its starters in a blowout. The last minute or two of a close game moves faster than any model, and live prices can change before you place a bet. If gambling stops being fun, call or text 1-800-GAMBLER.</p>
 </section>
 </main>
@@ -83,6 +83,7 @@ ig_css = """<style>
 .ig-row .tm{font-weight:600;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .ig-row .sc{font:600 1.6rem var(--font-mono);font-variant-numeric:tabular-nums;text-align:right}
 .ig-row .ch{font:600 1rem var(--font-mono);font-variant-numeric:tabular-nums;text-align:right;min-width:4.2rem}
+.ig-row .ch small{display:block;font:500 .78rem var(--font-mono);color:var(--muted);margin-top:1px}
 .ig-h{font:600 .68rem var(--font-body);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
 .ig-h span{text-align:right}
 .ig-row.r5{grid-template-columns:minmax(0,1fr) auto auto auto auto;gap:.2rem .7rem}
@@ -139,7 +140,7 @@ function verdict(teamA, teamH, ph, pa, phm){
 var cards = {}, games = {};
 function cardHTML(id){
   return '<article class="ig" id="g-' + id + '"><div class="ig-top"><span class="ig-state"></span><span class="small muted ig-pre"></span></div>' +
-    '<div class="ig-row r5 ig-h"><span></span><span></span><span>To win</span><span>Spread</span><span>Spread odds</span></div>' +
+    '<div class="ig-row r5 ig-h"><span></span><span></span><span>To win</span><span>Spread</span><span>Odds</span></div>' +
     '<div class="ig-row r5"><span class="tm ig-an"></span><span class="sc ig-as"></span><span class="ch ig-ac"></span><span class="cv ig-asp"></span><span class="cv ig-aod"></span></div>' +
     '<div class="ig-row r5"><span class="tm ig-hn"></span><span class="sc ig-hs"></span><span class="ch ig-hc"></span><span class="cv ig-hsp"></span><span class="cv ig-hod"></span></div>' +
     '<div class="ig-bar" aria-hidden="true"><span class="a"></span><span class="h"></span></div>' +
@@ -159,7 +160,8 @@ function paintCard(id){
     (pre ? "Pregame: Courtline " + (mu >= 0 ? g.home : g.away) + " by " + Math.abs(mu).toFixed(1) : "No pregame number; ratings only");
   q(c, "ig-an").textContent = g.an; q(c, "ig-hn").textContent = g.hn;
   q(c, "ig-as").textContent = g.state === "pre" ? "" : g.as_; q(c, "ig-hs").textContent = g.state === "pre" ? "" : g.hs;
-  q(c, "ig-ac").textContent = pc(1 - ph); q(c, "ig-hc").textContent = pc(ph);
+  function straight(p){ return g.state === "post" ? "" : "<small>" + CL.fmt(CL.fair(p)) + "</small>"; }   // the win chance as straight moneyline odds, no book cut
+  q(c, "ig-ac").innerHTML = pc(1 - ph) + straight(1 - ph); q(c, "ig-hc").innerHTML = pc(ph) + straight(ph);
   var hasSp = !!(pre && pre.spread != null);
   function odd(side){   // home side's line is pre.spread; after the final, did that side cover
     if (!hasSp) return "";
@@ -173,8 +175,7 @@ function paintCard(id){
   var done = g.state === "post";
   q(c, "ig-prices").hidden = done;
   q(c, "ig-pa").placeholder = g.away + " price"; q(c, "ig-ph").placeholder = g.home + " price";
-  q(c, "ig-fair").innerHTML = done ? "Final." : ("Fair price now: " + esc(g.away) + " " + CL.fmt(CL.fair(1 - ph)) + " · " + esc(g.home) + " " + CL.fmt(CL.fair(ph)) +
-    (g.state === "pre" ? ". Before tip this is the pregame chance; it moves with the score once the game starts." : ""));
+  q(c, "ig-fair").innerHTML = done ? "Final." : (g.state === "pre" ? "Before tip these are the pregame chances; they move with the score once the game starts." : "");
   q(c, "ig-v").innerHTML = done ? "" : verdict(g.away, g.home, ph, readPrice(q(c, "ig-pa")), readPrice(q(c, "ig-ph")));
 }
 function setStatus(cls, text){ $("ig-dot").className = "dot " + cls; $("ig-status").textContent = text; }
